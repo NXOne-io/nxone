@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Fraunces Variable", Georgia, serif;
+  --font-body: "Inter Variable", system-ui, sans-serif;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body { @apply bg-canvas text-ink font-sans antialiased; }
+h1, h2, h3 { @apply font-display text-ink; font-variation-settings: "SOFT" 0, "WONK" 0, "opsz" 40; letter-spacing: -0.01em; }
+:focus-visible { outline: 2px solid #0B3D2E; outline-offset: 2px; border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+@layer components {
+  .wrap { @apply mx-auto w-full max-w-page px-4 sm:px-6; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-primary { @apply btn bg-forest text-white hover:bg-forest-soft; }
+  .btn-accent { @apply btn bg-lime text-forest hover:bg-lime-deep hover:text-white; }
+  .btn-ghost { @apply btn border border-line bg-white text-ink hover:border-ink; }
+  .btn-quiet { @apply btn text-ink-soft hover:bg-white hover:text-ink; }
+  .field { @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-forest focus:outline-none; }
+  .field-lg { @apply field text-base; }
+  .label { @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-faint; }
+  .card { @apply rounded-xl border border-line bg-white shadow-card; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-2.5 py-1 text-xs font-medium text-ink-soft; }
+  .tabular { font-variant-numeric: tabular-nums; }
+  /* long-form reading: guides, legal pages, the explanations under a calculator */
+  .prose-ft { @apply text-ink-soft; }
+  .prose-ft p { @apply mt-4 leading-relaxed; }
+  .prose-ft h2 { @apply mt-10 text-2xl text-ink; }
+  .prose-ft h3 { @apply mt-8 text-lg text-ink; }
+  .prose-ft ul, .prose-ft ol { @apply mt-4 space-y-2 pl-5; }
+  .prose-ft ul { @apply list-disc; }
+  .prose-ft ol { @apply list-decimal; }
+  .prose-ft li { @apply leading-relaxed; }
+  .prose-ft a { @apply font-medium text-ink underline decoration-line underline-offset-2 hover:decoration-ink; }
+  .prose-ft strong { @apply font-semibold text-ink; }
+  .prose-ft table { @apply mt-6 w-full border-collapse text-sm; }
+  .prose-ft th, .prose-ft td { @apply border-b border-line px-3 py-2 text-left; }
+  .prose-ft th { @apply font-semibold text-ink; }
+}
+
+/* the document preview keeps print proportions on screen */
+.sheet { aspect-ratio: 1 / 1.414; }
+@media print {
+  body { background: #fff; }
+  .no-print { display: none !important; }
+}
