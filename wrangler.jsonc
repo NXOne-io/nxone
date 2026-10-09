@@ -1,0 +1,13 @@
+{
+  "name": "nxone",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    // Everything NXOne does happens in the browser, so the deploy is a folder of files.
+    "directory": "./out",
+    // Serve /calculators/markup from calculators/markup/index.html, and redirect the
+    // version without the trailing slash rather than returning a 404.
+    "html_handling": "auto-trailing-slash",
+    // Unknown addresses get our own 404 page instead of Cloudflare's.
+    "not_found_handling": "404-page"
+  }
+}
