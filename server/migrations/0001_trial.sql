@@ -1,0 +1,1 @@
+ALTER TABLE `organisations` ADD `trial_ends_at` integer;
