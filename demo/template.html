@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NXOne, working demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#121712;--soft:#4A5449;--faint:#7C877B;--canvas:#F6F7F4;--line:#E1E5DE;--forest:#0B3D2E;--pale:#E8F1EC;--lime:#C6F24E;--white:#fff;--warn:#B54708;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#ECEFE9;--soft:#B6BDB2;--faint:#8B938A;--canvas:#12150F;--line:#2B3129;--pale:#16271F;--white:#191D17}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.55 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.biz,.doctitle{font-family:Fraunces,Georgia,serif;letter-spacing:-.01em;margin:0}
+.wrap{max-width:96rem;margin:0 auto;padding:0 1rem}
+header.top{border-bottom:1px solid var(--line);background:var(--white);position:sticky;top:0;z-index:20}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;padding:.75rem 0}
+.brand{display:flex;align-items:center;gap:.5rem;font-family:Fraunces,serif;font-size:1.2rem;font-weight:600}
+.kinds{display:flex;gap:.2rem;background:var(--canvas);border:1px solid var(--line);border-radius:10px;padding:3px}
+.kinds button{border:0;background:none;color:var(--soft);font:600 .85rem Inter,sans-serif;padding:.4rem .75rem;border-radius:7px;cursor:pointer}
+.kinds button.on{background:var(--forest);color:#fff}
+button.primary{background:var(--forest);color:#fff;border:0;border-radius:9px;padding:.55rem 1rem;font:600 .9rem Inter,sans-serif;cursor:pointer}
+button.ghost{background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:.5rem .85rem;font:600 .85rem Inter,sans-serif;cursor:pointer}
+button.link{background:none;border:0;color:var(--faint);font:500 .8rem Inter,sans-serif;cursor:pointer;padding:.3rem 0;text-decoration:underline}
+main{display:grid;gap:1.5rem;padding:1.25rem 0;min-width:0}
+main>section{min-width:0;max-width:100%}
+@media(min-width:1080px){main{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}.pane-preview{position:sticky;top:5rem}}
+.card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:1.1rem;margin-bottom:1rem;max-width:100%;overflow-wrap:anywhere}
+.card h2{font-size:1.05rem}
+.hint{margin:.3rem 0 .85rem;color:var(--faint);font-size:.85rem}
+.grid{display:grid;gap:.75rem;min-width:0}.grid>*{min-width:0}
+.grid.two{grid-template-columns:1fr}.grid.three{grid-template-columns:1fr}.grid.four{grid-template-columns:1fr 1fr}
+@media(min-width:560px){.grid.two{grid-template-columns:1fr 1fr}.grid.three{grid-template-columns:repeat(3,1fr)}.grid.four{grid-template-columns:repeat(4,1fr)}}
+.span{grid-column:1/-1}
+label{display:block;font-size:.78rem;font-weight:600;color:var(--soft)}
+label.inline{display:flex;align-items:center;gap:.5rem;font-weight:500;color:var(--soft);margin-top:.6rem}
+input,select,textarea{width:100%;min-width:0;max-width:100%;margin-top:.25rem;padding:.5rem .6rem;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink);font:400 .9rem Inter,sans-serif}
+label.inline input{width:auto;margin:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--forest);outline-offset:1px;border-color:var(--forest)}
+input[type=file]{padding:.35rem;font-size:.8rem}
+.filerow{display:flex;align-items:center;gap:.5rem}
+small{display:block;margin-top:.3rem;font-weight:500;color:var(--faint)}
+.item{border:1px solid var(--line);border-radius:11px;padding:.85rem;margin-bottom:.75rem}
+.row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem}
+.hsn-results{display:block}
+.hsn-hit{display:block;width:100%;text-align:left;margin-top:.3rem;padding:.45rem .6rem;border:1px solid var(--line);border-radius:9px;background:var(--white);cursor:pointer}
+.hsn-hit:hover{background:var(--pale)}
+.hsn-hit b{display:block;font-size:.85rem;font-weight:600;color:var(--ink)}
+.hsn-hit span{font-size:.75rem;color:var(--faint)}
+.warn,.warnings{margin:.75rem 0 0;padding:.6rem .8rem;border:1px solid #f0d5b0;background:#fdf6ec;border-radius:10px;color:var(--warn);font-size:.85rem}
+.warnings{padding-left:1.6rem}
+#preview{overflow-x:auto}
+.sheet{max-width:100%;background:#fff;color:#121712;border:1px solid var(--line);border-radius:12px;padding:2rem;font-size:13px}
+@media(max-width:620px){.sheet{padding:1rem;font-size:12px}.sheet table{min-width:22rem}.notes{max-width:none}}
+.sheet-head{display:flex;flex-wrap:wrap;gap:1.5rem;justify-content:space-between;border-bottom:2px solid var(--accent);padding-bottom:1rem}
+.idblock{display:flex;gap:.9rem;align-items:flex-start}
+.logo{max-height:56px;max-width:140px;object-fit:contain}
+.biz{font-size:1.25rem;font-weight:600}
+.doctitle{font-size:1.5rem;font-weight:600;color:var(--accent)}
+.right{text-align:right}
+.muted{color:#4A5449;margin:.15rem 0}
+.cap{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#7C877B;margin:.75rem 0 .2rem}
+.strong{font-weight:600}
+.sheet-parties{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1.5rem;margin-top:1rem}
+.sheet table{width:100%;border-collapse:collapse;margin-top:1.5rem}
+.sheet thead tr{background:var(--accent);color:#fff}
+.sheet th,.sheet td{padding:.5rem .6rem;text-align:left}
+.sheet .num{text-align:right;font-variant-numeric:tabular-nums}
+.sheet tbody tr{border-bottom:1px solid #E1E5DE}
+.sheet-foot{display:flex;flex-wrap:wrap;gap:2rem;justify-content:space-between;margin-top:1.25rem}
+.notes{max-width:22rem}
+.sums{margin-left:auto;min-width:15rem}
+.sums div{display:flex;justify-content:space-between;color:#4A5449;padding:.15rem 0;font-variant-numeric:tabular-nums}
+.swatch{width:1.5rem;height:1.5rem;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.swatch.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.sheet.centred .sheet-head{flex-direction:column;align-items:center;text-align:center;border-bottom:1px solid #E1E5DE}
+.sheet.centred .idblock{flex-direction:column;align-items:center;text-align:center}
+.sheet.centred .right{text-align:center}
+.sheet.zebra tbody tr:nth-child(even){background:#F6F7F4}
+.sheet .sheet-parties{margin-top:calc(1rem * var(--air,1))}
+.sheet table{margin-top:calc(1.5rem * var(--air,1))}
+.sheet .sheet-foot{margin-top:calc(1.25rem * var(--air,1))}
+.sheet .sheet-sign{margin-top:calc(2.5rem * var(--air,1))}
+.tplpick{display:flex;gap:.2rem}
+.tplpick button{padding:.4rem .6rem;font-size:.78rem}
+.band{height:.65rem;margin:-2rem -2rem 1.4rem;background:var(--accent)}
+@media(max-width:620px){.band{margin:-1rem -1rem 1rem}}
+.sheet-head.ruled{border-bottom:2px solid var(--accent)}
+.sheet-head{border-bottom:0;padding-bottom:1rem}
+.sheet table.filled thead tr{background:var(--accent);color:#fff}
+.sheet table.clean thead tr,.sheet table.ruled thead tr{background:none;color:#121712;border-bottom:1.5px solid var(--accent)}
+.sheet table.clean tbody tr{border-bottom:0}
+.code{display:block;font-size:.68rem;color:#7C877B}
+.paidstamp{display:inline-block;margin-top:.4rem;padding:.1rem .5rem;border:1px solid var(--accent);border-radius:4px;color:var(--accent);font-weight:700;font-size:.7rem}
+.sheet-sign{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:2rem;margin-top:2.5rem}
+.accept{width:14rem}
+.accept .sigline{margin-top:2.5rem}
+.pick{flex:1;display:flex;align-items:flex-start;gap:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;background:var(--white);cursor:pointer;font-weight:500}
+.pick.on{border-color:var(--forest);background:var(--pale)}
+.pick input{width:auto;margin:.15rem 0 0}
+.pick b{display:block;font-size:.85rem;color:var(--ink)}
+.pick i{display:block;font-style:normal;font-size:.72rem;color:var(--faint)}
+.tagline{font-size:.72rem;color:var(--faint);border:1px solid var(--line);border-radius:999px;padding:.15rem .6rem}
+.hsnsum{margin-top:1.25rem}
+.mini{width:100%;border-collapse:collapse;font-size:.72rem;margin-top:.3rem}
+.mini th,.mini td{padding:.3rem .4rem;border-bottom:1px solid #E1E5DE;text-align:left}
+.mini thead tr{background:none;color:#7C877B;border-top:1px solid #E1E5DE}
+.esign{margin-top:2rem;text-align:center;font-style:italic;color:#7C877B;font-size:.78rem}
+.signblock{margin-top:2rem;margin-left:auto;width:13rem;text-align:center}
+.signblock img{max-height:3.5rem;margin:0 auto .2rem;display:block}
+.sigspace{display:block;height:3.5rem}
+.sigline{display:block;border-top:1px solid #E1E5DE;padding-top:.35rem;font-size:.72rem;color:#7C877B}
+.sums .total{border-top:2px solid var(--accent);margin-top:.35rem;padding-top:.45rem;color:#121712;font-weight:700;font-size:1rem}
+.note{color:var(--faint);font-size:.82rem}
+footer{border-top:1px solid var(--line);padding:1.25rem 0;color:var(--faint);font-size:.82rem}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap bar">
+  <span class="brand"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#0B3D2E"/><path d="M9 22V10l14 12V10" stroke="#C6F24E" stroke-width="2.6" fill="none" stroke-linecap="square"/></svg>NXOne</span>
+  <div class="kinds" role="tablist" aria-label="Document type">
+    <button data-kind="invoice" class="on">Invoice</button>
+    <button data-kind="quote">Quotation</button>
+    <button data-kind="purchase-order">Purchase order</button>
+    <button data-kind="receipt">Receipt</button>
+  </div>
+  <button class="ghost" id="demo">Try it with sample data</button>
+  <button class="ghost" id="reset">Clear</button>
+  <button class="primary" id="download" style="margin-left:auto">Download PDF</button>
+</div></header>
+
+<div class="wrap"><main>
+  <section id="form" class="pane-form" aria-label="Document details"></section>
+  <section class="pane-preview">
+    <div id="preview" aria-label="Preview"></div>
+    <p class="note" style="text-align:center;margin-top:.75rem">This is the real thing, not a picture of it. Everything runs in your browser and nothing is uploaded.</p>
+  </section>
+</main></div>
+
+<footer class="wrap">NXOne demo. Tax rates come with their source and the date they took effect. India moved to 5%, 18% and 40% on 22 September 2025, and invoices dated before that still calculate on the old slabs.</footer>
+<script>__BUNDLE__</script>
+</body></html>
