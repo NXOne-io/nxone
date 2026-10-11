@@ -1,3 +1,4 @@
+import type { Registration } from "../compliance/rules";
 import type { DocumentData, DocumentKind } from "../documents/types";
 
 /** Your own business, filled into every document so you type it once. */
@@ -15,6 +16,10 @@ export interface Profile extends Syncable {
   signatureDataUrl?: string;
   signatoryName?: string;
   paymentDetails?: string;
+  /** What the business is registered for, which decides the filing calendar. */
+  registrations?: Registration[];
+  /** Indian businesses on the QRMP scheme file GST quarterly rather than monthly. */
+  quarterlyGst?: boolean;
   /** Your UPI id, used to put a scannable QR on Indian invoices. */
   upiId?: string;
   /** A hosted payment page, for cards and overseas customers. */

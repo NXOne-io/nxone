@@ -7,7 +7,7 @@ import { absoluteUrl } from "@/lib/config";
 
 export const dynamic = "force-static";
 
-const TOOLS = ["/pricing", "/dashboard", "/documents", "/receivables", "/cash-flow", "/reports", "/expenses", "/books", "/settings", "/sign-in", "/invoice-generator", "/quotation-generator", "/purchase-order-generator", "/receipt-generator", "/hsn-code-finder", "/calculators"];
+const TOOLS = ["/pricing", "/today", "/dashboard", "/documents", "/compliance", "/receivables", "/cash-flow", "/reports", "/expenses", "/books", "/settings", "/sign-in", "/invoice-generator", "/quotation-generator", "/purchase-order-generator", "/receipt-generator", "/hsn-code-finder", "/calculators"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

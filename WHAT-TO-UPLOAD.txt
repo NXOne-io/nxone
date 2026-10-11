@@ -1,0 +1,38 @@
+NEW: Today, and the filing calendar
+===================================
+
+NEW
+  lib/compliance/rules.ts          filing obligations as dated, sourced data
+  lib/compliance/calendar.ts       turning those rules into actual dates
+  lib/analysis/today.ts            what needs doing, and nothing else
+  components/Today.tsx             the Today screen
+  components/Compliance.tsx        the filing calendar
+  app/(app)/today/page.tsx
+  app/(app)/compliance/page.tsx
+  tests/compliance.test.ts         18 tests
+
+REPLACE
+  components/Sidebar.tsx           adds Today and Filing calendar
+  app/sitemap.ts                   adds both pages
+  lib/store/types.ts               what the business is registered for
+
+TODAY
+  Cash, owed to you, what you owe and the next filing, then a list of things
+  that need doing, ordered by urgency. Nothing appears unless there is
+  something to act on: a quiet day shows an empty screen on purpose.
+  It covers overdue customers, unpaid bills, filings due or missed, cash
+  running out, and quieter things such as documents left as drafts or invoices
+  with no due date.
+
+FILING CALENDAR
+  Tick what you are registered for, including the QRMP scheme for Indian GST,
+  and the dates are worked out for you: GSTR-1 for May is the 11th of June,
+  GSTR-3B the 20th, and so on. UK, UAE, Singapore and Australia are covered too.
+  Nothing appears for a registration you have not ticked, because a calendar
+  full of irrelevant dates teaches people to ignore all of them.
+
+  Every deadline is shown with the authority it comes from, and the page says
+  plainly that dates get extended and positions differ, so check what matters.
+
+STILL TO COME
+  Recurring invoices, which is the last feature on the list before launch.

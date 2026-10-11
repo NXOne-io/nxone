@@ -1,5 +1,5 @@
 "use client";
-import { BookOpen, Building2, Calculator, ChartColumn, FileText, FolderOpen, HandCoins, LayoutDashboard, Quote, Receipt, Search, ShoppingCart, TrendingDown, Wallet, X } from "lucide-react";
+import { BookOpen, Building2, CalendarClock, Calculator, ChartColumn, FileText, FolderOpen, HandCoins, LayoutDashboard, Quote, Receipt, Search, ShoppingCart, Sun, TrendingDown, Wallet, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -9,11 +9,13 @@ const GROUPS: Array<{ title: string; items: Array<{ href: string; label: string;
   {
     title: "Overview",
     items: [
+      { href: "/today", label: "Today", icon: Sun },
       { href: "/dashboard", label: "Your money", icon: LayoutDashboard },
       { href: "/documents", label: "Documents", icon: FolderOpen },
       { href: "/receivables", label: "Owed to you", icon: HandCoins },
       { href: "/cash-flow", label: "Cash", icon: Wallet },
-      { href: "/reports", label: "Reports", icon: ChartColumn }
+      { href: "/reports", label: "Reports", icon: ChartColumn },
+      { href: "/compliance", label: "Filing calendar", icon: CalendarClock }
     ]
   },
   {
