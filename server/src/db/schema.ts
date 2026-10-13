@@ -55,7 +55,7 @@ export const memberships = sqliteTable("memberships", {
 export const records = sqliteTable("records", {
   id: id(),
   orgId: text("org_id").notNull().references(() => organisations.id),
-  kind: text("kind", { enum: ["profile", "client", "item", "document", "expense"] }).notNull(),
+  kind: text("kind", { enum: ["profile", "client", "item", "document", "expense", "recurring"] }).notNull(),
   /** The client's own id, which is what sync matches on. */
   localId: text("local_id").notNull(),
   body: text("body").notNull(),

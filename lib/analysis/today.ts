@@ -3,7 +3,8 @@ import { chaseList } from "./receivables";
 import { calendarFor, nextDeadline, type Deadline } from "../compliance/calendar";
 import type { Registration } from "../compliance/rules";
 import { fromMinor, type Money } from "../money";
-import type { Expense, SavedDocument } from "../store/types";
+import type { Expense, RecurringTemplate, SavedDocument } from "../store/types";
+import { due as dueRecurring } from "../recurring/schedule";
 
 /**
  * One screen that answers what needs doing.
@@ -36,6 +37,7 @@ export interface Today {
 export function todayView(opts: {
   documents: SavedDocument[];
   expenses: Expense[];
+  recurring?: RecurringTemplate[];
   today: string;
   currency: string;
   country: string;
@@ -43,7 +45,7 @@ export function todayView(opts: {
   quarterlyGst?: boolean;
   businessName?: string;
 }): Today {
-  const { documents, expenses, today, currency, country, registrations, quarterlyGst } = opts;
+  const { documents, expenses, recurring = [], today, currency, country, registrations, quarterlyGst } = opts;
 
   const f = forecast(documents, expenses, today, currency, 30);
   const chase = chaseList(documents, today, currency, 3);
@@ -68,6 +70,19 @@ export function todayView(opts: {
       href: "/receivables/",
       action: "Send a reminder",
       urgency: c.daysLate > 30 ? "now" : "soon"
+    });
+  }
+
+  const waiting = dueRecurring(recurring, today);
+  if (waiting.length) {
+    items.push({
+      id: "recurring",
+      kind: "collect",
+      title: `${waiting.length} repeating invoice${waiting.length === 1 ? "" : "s"} ready to make`,
+      detail: waiting.slice(0, 3).map((t) => t.name).join(", "),
+      href: "/recurring/",
+      action: "Make them",
+      urgency: "soon"
     });
   }
 

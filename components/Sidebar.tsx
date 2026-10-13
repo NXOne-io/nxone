@@ -1,5 +1,5 @@
 "use client";
-import { BookOpen, Building2, CalendarClock, Calculator, ChartColumn, FileText, FolderOpen, HandCoins, LayoutDashboard, Quote, Receipt, Search, ShoppingCart, Sun, TrendingDown, Wallet, X } from "lucide-react";
+import { BookOpen, Building2, CalendarClock, CalendarSync, Calculator, ChartColumn, FileText, FolderOpen, HandCoins, LayoutDashboard, Quote, Receipt, Search, ShoppingCart, Sun, TrendingDown, Wallet, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -31,7 +31,8 @@ const GROUPS: Array<{ title: string; items: Array<{ href: string; label: string;
       { href: "/invoice-generator", label: "Invoice", icon: FileText },
       { href: "/quotation-generator", label: "Quotation", icon: Quote },
       { href: "/purchase-order-generator", label: "Purchase order", icon: ShoppingCart },
-      { href: "/receipt-generator", label: "Receipt", icon: Receipt }
+      { href: "/receipt-generator", label: "Receipt", icon: Receipt },
+      { href: "/recurring", label: "Repeating", icon: CalendarSync }
     ]
   },
   {

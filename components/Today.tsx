@@ -21,7 +21,7 @@ export default function Today() {
   const country = ws.profile?.country ?? "IN";
   const today = todayIso();
   const t = todayView({
-    documents: db.documents(), expenses: db.expenses(), today, currency, country,
+    documents: db.documents(), expenses: db.expenses(), recurring: db.recurring(), today, currency, country,
     registrations: ws.profile?.registrations ?? [], quarterlyGst: ws.profile?.quarterlyGst
   });
   const m = (v: { minor: number; currency: string }) => formatMoney(v, "en-IN");

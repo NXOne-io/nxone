@@ -7,7 +7,7 @@ const doc = {} as DocumentData;
 const iso = (ms: number) => new Date(ms).toISOString();
 
 const workspace = (over: Partial<Workspace> = {}): Workspace => ({
-  version: 1, clients: [], items: [], documents: [], expenses: [], ...over
+  version: 1, clients: [], items: [], documents: [], expenses: [], recurring: [], ...over
 });
 
 const client = (over: Partial<Workspace["clients"][number]> = {}) => ({

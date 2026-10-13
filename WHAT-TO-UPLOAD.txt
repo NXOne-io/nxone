@@ -1,38 +1,43 @@
-NEW: Today, and the filing calendar
-===================================
+NEW: repeating invoices. The last feature before launch.
+========================================================
 
-NEW
-  lib/compliance/rules.ts          filing obligations as dated, sourced data
-  lib/compliance/calendar.ts       turning those rules into actual dates
-  lib/analysis/today.ts            what needs doing, and nothing else
-  components/Today.tsx             the Today screen
-  components/Compliance.tsx        the filing calendar
-  app/(app)/today/page.tsx
-  app/(app)/compliance/page.tsx
-  tests/compliance.test.ts         18 tests
+APP, NEW
+  lib/recurring/schedule.ts      the dates, and what to do about missed runs
+  components/Recurring.tsx       the screen
+  app/(app)/recurring/page.tsx
+  tests/recurring.test.ts        17 tests
 
-REPLACE
-  components/Sidebar.tsx           adds Today and Filing calendar
-  app/sitemap.ts                   adds both pages
-  lib/store/types.ts               what the business is registered for
+APP, REPLACE
+  lib/store/types.ts             templates in the workspace
+  lib/store/db.ts                saving, pausing and deleting them
+  lib/sync/records.ts            they sync like everything else
+  lib/analysis/today.ts          Today mentions invoices waiting to be made
+  components/Today.tsx           passes them in
+  components/Sidebar.tsx         adds Repeating
+  app/sitemap.ts                 adds the page
+  tests/sync.test.ts             fixture updated
 
-TODAY
-  Cash, owed to you, what you owe and the next filing, then a list of things
-  that need doing, ordered by urgency. Nothing appears unless there is
-  something to act on: a quiet day shows an empty screen on purpose.
-  It covers overdue customers, unpaid bills, filings due or missed, cash
-  running out, and quieter things such as documents left as drafts or invoices
-  with no due date.
+SERVER, REPLACE
+  server/src/db/schema.ts        knows about the new kind of record
+  server/src/sync/merge.ts       same
+  No migration needed: the record kind is a column value, not a constraint.
 
-FILING CALENDAR
-  Tick what you are registered for, including the QRMP scheme for Indian GST,
-  and the dates are worked out for you: GSTR-1 for May is the 11th of June,
-  GSTR-3B the 20th, and so on. UK, UAE, Singapore and Australia are covered too.
-  Nothing appears for a registration you have not ticked, because a calendar
-  full of irrelevant dates teaches people to ignore all of them.
+HOW IT WORKS
+  Set one up from an invoice you have already sent and it copies the customer,
+  the lines and the terms. Choose weekly, fortnightly, monthly, quarterly or
+  yearly, and pause or stop it whenever you like.
 
-  Every deadline is shown with the authority it comes from, and the page says
-  plainly that dates get extended and positions differ, so check what matters.
+  When one comes round it appears under Ready to make, and on Today. Pressing
+  the button creates a DRAFT with the next number and the scheduled dates.
+  Nothing is ever sent on its own, because an invoice going out unread is how a
+  wrong amount reaches a customer.
 
-STILL TO COME
-  Recurring invoices, which is the last feature on the list before launch.
+  Two awkward cases are handled. A retainer billed on the 31st goes out on the
+  28th in February and returns to the 31st in March, rather than drifting
+  earlier every month. And if the app has not been opened for three months, you
+  get the one invoice that is due and a note saying how many runs were skipped,
+  instead of a pile of backdated bills.
+
+AFTER IT DEPLOYS
+  /recurring/   set one up from an existing invoice, then make it
+  /today/       should mention anything waiting

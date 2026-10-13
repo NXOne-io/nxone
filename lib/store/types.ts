@@ -1,4 +1,5 @@
 import type { Registration } from "../compliance/rules";
+import type { RecurringTemplate } from "../recurring/schedule";
 import type { DocumentData, DocumentKind } from "../documents/types";
 
 /** Your own business, filled into every document so you type it once. */
@@ -112,6 +113,8 @@ export interface Expense extends Syncable {
   updatedAt: string;
 }
 
+export type { RecurringTemplate };
+
 export interface Workspace {
   version: 1;
   /** How far this device has caught up with the server, in milliseconds. */
@@ -123,6 +126,7 @@ export interface Workspace {
   items: CatalogueItem[];
   documents: SavedDocument[];
   expenses: Expense[];
+  recurring: RecurringTemplate[];
 }
 
-export const emptyWorkspace = (): Workspace => ({ version: 1, clients: [], items: [], documents: [], expenses: [] });
+export const emptyWorkspace = (): Workspace => ({ version: 1, clients: [], items: [], documents: [], expenses: [], recurring: [] });

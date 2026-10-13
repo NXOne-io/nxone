@@ -1,4 +1,4 @@
-import { emptyWorkspace, type CatalogueItem, type Client, type Expense, type Profile, type SavedDocument, type Workspace } from "./types";
+import { emptyWorkspace, type CatalogueItem, type Client, type Expense, type Profile, type RecurringTemplate, type SavedDocument, type Workspace } from "./types";
 
 /**
  * Everything a person saves lives on their own device. This is a small store over a storage
@@ -178,10 +178,10 @@ export class Store {
    * Deleting marks the row instead of removing it, so your other devices learn about it. A row the
    * server has never seen is dropped outright, since there is nobody to tell.
    */
-  private tombstone(collection: "clients" | "items" | "documents" | "expenses", id: string) {
+  private tombstone(collection: "clients" | "items" | "documents" | "expenses" | "recurring", id: string) {
     const ws = this.read();
     const now = new Date().toISOString();
-    const list = (ws[collection] ?? []) as Array<Client | CatalogueItem | SavedDocument | Expense>;
+    const list = (ws[collection] ?? []) as Array<Client | CatalogueItem | SavedDocument | Expense | RecurringTemplate>;
     const next = list
       .filter((row) => !(row.id === id && !row.syncedAt))
       .map((row) => (row.id === id ? { ...row, deletedAt: now, updatedAt: now, version: (row.version ?? 1) + 1 } : row));
@@ -200,6 +200,27 @@ export class Store {
   getCursor(): number { return this.read().syncCursor ?? 0; }
   setAccount(account: Workspace["account"]) { this.write({ ...this.read(), account }); }
   getAccount() { return this.read().account; }
+
+  /* ---- invoices that repeat ---- */
+
+  recurring(): RecurringTemplate[] {
+    return (this.read().recurring ?? []).filter(alive).sort((a, b) => a.nextDate.localeCompare(b.nextDate));
+  }
+
+  saveRecurring(input: Omit<RecurringTemplate, "createdAt" | "updatedAt"> & { createdAt?: string }): RecurringTemplate {
+    const now = new Date().toISOString();
+    const ws = this.read();
+    const list = ws.recurring ?? [];
+    const existing = list.find((r) => r.id === input.id);
+    const saved: RecurringTemplate = existing
+      ? { ...existing, ...input, createdAt: existing.createdAt, updatedAt: now, version: (existing.version ?? 1) + 1, deletedAt: undefined }
+      : { ...input, createdAt: input.createdAt ?? now, updatedAt: now, version: 1 };
+
+    this.write({ ...ws, recurring: existing ? list.map((r) => (r.id === saved.id ? saved : r)) : [...list, saved] });
+    return saved;
+  }
+
+  deleteRecurring(id: string) { this.tombstone("recurring", id); }
 
   /* ---- the whole lot ---- */
 
@@ -226,7 +247,8 @@ export class Store {
       clients: mergeById(ws.clients, incoming.clients ?? []),
       items: mergeById(ws.items, incoming.items ?? []),
       documents: mergeById(ws.documents, incoming.documents ?? []),
-      expenses: mergeById(ws.expenses ?? [], incoming.expenses ?? [])
+      expenses: mergeById(ws.expenses ?? [], incoming.expenses ?? []),
+      recurring: mergeById(ws.recurring ?? [], incoming.recurring ?? [])
     };
     this.write(next);
     return { clients: next.clients.length, items: next.items.length, documents: next.documents.length, expenses: next.expenses.length };
