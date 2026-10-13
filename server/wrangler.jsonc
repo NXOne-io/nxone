@@ -20,6 +20,10 @@
       "id": "local-development"
     }
   ],
+  // once a week, early on Monday. The handler itself refuses to send twice in a day.
+  "triggers": {
+    "crons": ["0 3 * * 1"]
+  },
   "vars": {
     "APP_ORIGIN": "https://nxone.io",
     "EMAIL_PROVIDER": "console"

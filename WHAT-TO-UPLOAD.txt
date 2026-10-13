@@ -1,43 +1,57 @@
-NEW: repeating invoices. The last feature before launch.
-========================================================
+PHASE 1: onboarding, sample data, email reminders
+=================================================
 
 APP, NEW
-  lib/recurring/schedule.ts      the dates, and what to do about missed runs
-  components/Recurring.tsx       the screen
-  app/(app)/recurring/page.tsx
-  tests/recurring.test.ts        17 tests
+  lib/setup/onboarding.ts        answers turned into a configured business
+  lib/setup/demo.ts              a believable business to look at
+  components/Onboarding.tsx      the three-step setup
+  components/DemoControls.tsx    add or clear the sample data
+  components/SetupPrompt.tsx     shown until setup is done, then only when useful
+  components/Notifications.tsx   email reminder settings
+  app/(app)/welcome/page.tsx
+  tests/setup.test.ts            15 tests
 
 APP, REPLACE
-  lib/store/types.ts             templates in the workspace
-  lib/store/db.ts                saving, pausing and deleting them
-  lib/sync/records.ts            they sync like everything else
-  lib/analysis/today.ts          Today mentions invoices waiting to be made
-  components/Today.tsx           passes them in
-  components/Sidebar.tsx         adds Repeating
-  app/sitemap.ts                 adds the page
-  tests/sync.test.ts             fixture updated
+  components/Sidebar.tsx         "Set up your business" until it is done
+  components/Today.tsx           shows the setup prompt
+  components/Dashboard.tsx       same
+  components/SyncPanel.tsx       honest wording when syncing is paused
+  app/(app)/settings/page.tsx    adds notifications and sample data
+  app/sitemap.ts                 adds the welcome page
+  lib/sync/api.ts                notification endpoints
+
+SERVER, NEW
+  server/src/notify/digest.ts            what the weekly email says
+  server/tests/digest.test.ts            7 tests
+  server/migrations/0002_notifications.sql
 
 SERVER, REPLACE
-  server/src/db/schema.ts        knows about the new kind of record
-  server/src/sync/merge.ts       same
-  No migration needed: the record kind is a column value, not a constraint.
+  server/src/index.ts            preferences, preview, and the scheduled run
+  server/src/db/schema.ts        notification preferences table
+  server/wrangler.jsonc          the weekly schedule
+  server/migrations/meta/        migration bookkeeping
 
-HOW IT WORKS
-  Set one up from an invoice you have already sent and it copies the customer,
-  the lines and the terms. Choose weekly, fortnightly, monthly, quarterly or
-  yearly, and pause or stop it whenever you like.
+AFTER DEPLOYING THE API
+  cd server && npx wrangler d1 migrations apply nxone --remote
 
-  When one comes round it appears under Ready to make, and on Today. Pressing
-  the button creates a DRAFT with the next number and the scheduled dates.
-  Nothing is ever sent on its own, because an invoice going out unread is how a
-  wrong amount reaches a customer.
+WHAT THESE DO
+  Onboarding: three short questions, then a screen listing what was configured.
+  New visitors are pointed at it instead of landing on an empty dashboard.
 
-  Two awkward cases are handled. A retainer billed on the 31st goes out on the
-  28th in February and returns to the 31st in March, rather than drifting
-  earlier every month. And if the app has not been opened for three months, you
-  get the one invoice that is due and a note saying how many runs were skipped,
-  instead of a pile of backdated bills.
+  Sample data: a made-up business with three customers, six invoices at
+  different ages including two overdue, three months of expenses and a repeating
+  invoice that is due. Clearly marked, and clearing it leaves your own work
+  untouched.
 
-AFTER IT DEPLOYS
-  /recurring/   set one up from an existing invoice, then make it
-  /today/       should mention anything waiting
+  Email reminders: off unless asked for, sent Monday mornings, and never sent
+  when there is nothing to say. There is a preview button so nobody has to wait
+  a week to see what it looks like.
+
+TWO THINGS FIXED ALONG THE WAY
+  The sidebar read local storage while rendering on the server, which caused a
+  hydration error on every page. It now waits for the first paint.
+
+  When syncing is paused because a plan does not include it, the panel used to
+  say "everything here is on your account", which was untrue at exactly the
+  moment it mattered. It now says syncing is paused and the device is the only
+  copy.

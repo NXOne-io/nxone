@@ -41,6 +41,10 @@ export default function SyncPanel() {
           <h2 className="font-display text-lg">Syncing</h2>
           {status.state === "signed-out" ? (
             <p className="mt-1 text-sm text-ink-soft">Not signed in, so this device is the only copy of your work.</p>
+          ) : status.state === "needs-plan" ? (
+            <p className="mt-1 max-w-2xl text-sm text-ink-soft">
+              Signed in as {status.email}. Syncing is paused, so this device is the only copy of your work. Everything here keeps working exactly as it does now.
+            </p>
           ) : (
             <p className="mt-1 text-sm text-ink-soft">
               Signed in as {status.email}. Last synced {when(status.lastSyncedAt)}.
@@ -53,10 +57,18 @@ export default function SyncPanel() {
           {status.state === "working" ? <span className="flex items-center gap-1.5 text-sm text-ink-soft"><Loader2 size={15} className="animate-spin" />Working</span> : null}
           {status.state === "idle" ? <span className="flex items-center gap-1.5 text-sm text-ok"><Check size={15} />Up to date</span> : null}
           {status.state === "error" ? <span className="flex items-center gap-1.5 text-sm text-warn"><TriangleAlert size={15} />Could not sync</span> : null}
+          {status.state === "needs-plan" ? <span className="flex items-center gap-1.5 text-sm text-ink-soft"><CloudOff size={15} />Paused</span> : null}
         </div>
       </div>
 
-      {status.message ? <p className="mt-3 rounded-lg border border-warn/30 bg-warn/5 p-3 text-sm text-warn">{status.message} Your work is safe on this device and will go up when the connection returns.</p> : null}
+      {status.state === "needs-plan" ? (
+        <div className="mt-3 rounded-lg border border-line bg-canvas p-3 text-sm text-ink-soft">
+          {status.message ?? "Syncing is part of Pro."}{" "}
+          <Link href="/pricing/" className="font-medium underline">See what Pro includes</Link>
+        </div>
+      ) : status.message ? (
+        <p className="mt-3 rounded-lg border border-warn/30 bg-warn/5 p-3 text-sm text-warn">{status.message} Your work is safe on this device and will go up when the connection returns.</p>
+      ) : null}
 
       {status.overwritten > 0 ? (
         <p className="mt-3 rounded-lg border border-line bg-canvas p-3 text-sm text-ink-soft">
@@ -67,6 +79,11 @@ export default function SyncPanel() {
       <div className="mt-4 flex flex-wrap gap-2">
         {status.state === "signed-out" ? (
           <Link href="/sign-in/" className="btn-primary">Sign in to sync</Link>
+        ) : status.state === "needs-plan" ? (
+          <>
+            <Link href="/pricing/" className="btn-primary">See Pro</Link>
+            <button type="button" className="btn-quiet" onClick={() => { if (confirm("Sign out? Your data stays on this device.")) void sync.signOutNow(); }}>Sign out</button>
+          </>
         ) : (
           <>
             <button type="button" className="btn-ghost" onClick={() => void sync.run()} disabled={status.state === "working"}><RefreshCw size={15} />Sync now</button>

@@ -55,6 +55,13 @@ export const plans = (country?: string) => call<{ country: string; provider: str
 export const checkout = (plan: string, period: "monthly" | "yearly") =>
   call<{ url: string | null; reference: string; note?: string; provider: string; connected: boolean }>("/billing/checkout", { method: "POST", body: JSON.stringify({ plan, period }) });
 
+export interface NotificationPrefs { weeklyDigest: boolean; overdueAlerts: boolean; lastSentAt?: number | null }
+
+export const notificationPrefs = () => call<NotificationPrefs>("/notifications/preferences");
+export const saveNotificationPrefs = (prefs: NotificationPrefs) =>
+  call<NotificationPrefs>("/notifications/preferences", { method: "POST", body: JSON.stringify(prefs) });
+export const previewDigest = () => call<{ worthSending: boolean; subject: string; lines: string[] }>("/notifications/preview");
+
 export const pull = (since: number) => call<{ records: WireRecord[]; cursor: number; more: boolean }>(`/sync/pull?since=${since}`);
 
 export const push = (records: WireRecord[]) =>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Logo from "./Logo";
+import { useHydrated, useWorkspace } from "@/lib/store/useStore";
 
 const GROUPS: Array<{ title: string; items: Array<{ href: string; label: string; icon: typeof FileText; soon?: boolean }> }> = [
   {
@@ -50,6 +51,11 @@ const GROUPS: Array<{ title: string; items: Array<{ href: string; label: string;
 
 export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const path = usePathname();
+  const [ws] = useWorkspace();
+  // the profile lives in this browser, so the server cannot know it: wait for the first paint
+  // before deciding, or the markup will not match and React will complain
+  const hydrated = useHydrated();
+  const setUp = !hydrated || Boolean(ws.profile?.name);
   useEffect(() => { onClose(); }, [path, onClose]);
 
   return (
@@ -65,6 +71,11 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-4">
+          {!setUp ? (
+            <Link href="/welcome/" className={`mb-5 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold ${path === "/welcome" ? "bg-forest text-white" : "bg-forest-pale text-forest"}`}>
+              Set up your business
+            </Link>
+          ) : null}
           {GROUPS.map((g) => (
             <div key={g.title} className="mb-6">
               <p className="mb-1 px-2 text-[0.68rem] font-semibold uppercase tracking-wider text-ink-faint">{g.title}</p>

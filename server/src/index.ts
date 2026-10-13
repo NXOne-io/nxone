@@ -9,6 +9,7 @@ import { paymentProvider } from "./billing/provider";
 import * as schema from "./db/schema";
 import { emailSender, loginEmail } from "./http/email";
 import { corsHeaders, json, problem, rateLimit } from "./http/respond";
+import { buildDigest, digestEmail } from "./notify/digest";
 import { changesSince, mergePush, type SyncRecord } from "./sync/merge";
 
 export interface Env {
@@ -63,7 +64,51 @@ async function audit(db: DrizzleD1Database<typeof schema>, req: Request, entry: 
   });
 }
 
+/** Builds the digest for an organisation from the records it has synced. */
+async function digestFor(db: DrizzleD1Database<typeof schema>, orgId: string, today: string) {
+  const rows = await db.select().from(schema.records).where(eq(schema.records.orgId, orgId));
+  const records = rows.filter((r) => !r.deletedAt).map((r) => ({ kind: r.kind, body: JSON.parse(r.body) as Record<string, unknown> }));
+  const profile = records.find((r) => r.kind === "profile")?.body as { name?: string; currency?: string } | undefined;
+  return buildDigest({
+    businessName: profile?.name,
+    currency: profile?.currency ?? "INR",
+    today,
+    records
+  });
+}
+
 export default {
+  /**
+   * The scheduled run. Sending is deliberately conservative: only people who asked, only when
+   * there is something to say, and never more than once a day however often this runs.
+   */
+  async scheduled(_event: ScheduledController, env: Env): Promise<void> {
+    const db = drizzle(env.DB, { schema });
+    const today = new Date().toISOString().slice(0, 10);
+    const sender = emailSender(env);
+
+    const wanted = await db.select({
+      prefs: schema.notificationPrefs,
+      email: schema.users.email
+    }).from(schema.notificationPrefs)
+      .innerJoin(schema.users, eq(schema.notificationPrefs.userId, schema.users.id))
+      .where(eq(schema.notificationPrefs.weeklyDigest, true));
+
+    for (const row of wanted) {
+      const lastSent = row.prefs.lastSentAt?.getTime() ?? 0;
+      if (Date.now() - lastSent < 20 * 60 * 60 * 1000) continue;
+
+      const digest = await digestFor(db, row.prefs.orgId, today);
+      if (!digest.worthSending) continue;
+
+      const mail = digestEmail(digest, env.APP_ORIGIN);
+      const sent = await sender.send({ to: row.email, subject: mail.subject, text: mail.text });
+      if (sent) {
+        await db.update(schema.notificationPrefs).set({ lastSentAt: new Date() }).where(eq(schema.notificationPrefs.id, row.prefs.id));
+      }
+    }
+  },
+
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url);
     /**
@@ -317,6 +362,42 @@ export default {
 
         await audit(db, req, { orgId, action: "billing.webhook", summary: `${event.event ?? "event"} -> ${active ? "active" : "inactive"}` });
         return reply(json({ ok: true }));
+      }
+
+      /* ---------- what you want to hear about ---------- */
+      if (url.pathname === "/notifications/preferences") {
+        const found = await currentSession(req, env);
+        if (!found?.session.orgId) return reply(problem(401, "Not signed in."));
+        const orgId = found.session.orgId;
+
+        if (req.method === "POST") {
+          const body = (await req.json()) as { weeklyDigest?: boolean; overdueAlerts?: boolean };
+          const existing = (await db.select().from(schema.notificationPrefs)
+            .where(and(eq(schema.notificationPrefs.userId, found.session.userId), eq(schema.notificationPrefs.orgId, orgId))).limit(1))[0];
+
+          const values = {
+            userId: found.session.userId, orgId,
+            weeklyDigest: Boolean(body.weeklyDigest), overdueAlerts: Boolean(body.overdueAlerts),
+            updatedAt: new Date()
+          };
+          if (existing) await db.update(schema.notificationPrefs).set(values).where(eq(schema.notificationPrefs.id, existing.id));
+          else await db.insert(schema.notificationPrefs).values({ id: uid("np"), ...values });
+
+          await audit(db, req, { orgId, userId: found.session.userId, action: "notifications.changed", summary: `digest ${values.weeklyDigest}, overdue ${values.overdueAlerts}` });
+          return reply(json({ ok: true, ...values }));
+        }
+
+        const row = (await db.select().from(schema.notificationPrefs)
+          .where(and(eq(schema.notificationPrefs.userId, found.session.userId), eq(schema.notificationPrefs.orgId, orgId))).limit(1))[0];
+        return reply(json({ weeklyDigest: row?.weeklyDigest ?? false, overdueAlerts: row?.overdueAlerts ?? false, lastSentAt: row?.lastSentAt?.getTime() ?? null }));
+      }
+
+      /* ---------- a preview, so nobody has to wait a week to see what it says ---------- */
+      if (url.pathname === "/notifications/preview") {
+        const found = await currentSession(req, env);
+        if (!found?.session.orgId) return reply(problem(401, "Not signed in."));
+        const digest = await digestFor(db, found.session.orgId, new Date().toISOString().slice(0, 10));
+        return reply(json(digest));
       }
 
       /* ---------- take everything with you ---------- */

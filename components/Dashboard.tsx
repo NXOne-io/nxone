@@ -1,4 +1,5 @@
 "use client";
+import SetupPrompt from "./SetupPrompt";
 import { ArrowRight, FileText, Quote, Receipt, ShoppingCart, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { formatDate, todayIso } from "@/lib/format";
@@ -44,6 +45,8 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
+
+      <SetupPrompt />
 
       <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Card label="Owed to you" value={m(s.outstanding)} sub={`${s.byClient.reduce((a, c) => a + c.count, 0)} unpaid documents`} strong />

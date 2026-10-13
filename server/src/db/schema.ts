@@ -95,6 +95,18 @@ export const loginTokens = sqliteTable("login_tokens", {
   requestIp: text("request_ip")
 }, (t) => ({ byEmail: index("login_tokens_email_idx").on(t.email) }));
 
+/** What each person wants to hear about, and when they last heard it. */
+export const notificationPrefs = sqliteTable("notification_prefs", {
+  id: id(),
+  userId: text("user_id").notNull().references(() => users.id),
+  orgId: text("org_id").notNull().references(() => organisations.id),
+  /** Off by default: an email nobody asked for is spam, however useful we think it is. */
+  weeklyDigest: integer("weekly_digest", { mode: "boolean" }).notNull().default(false),
+  overdueAlerts: integer("overdue_alerts", { mode: "boolean" }).notNull().default(false),
+  lastSentAt: integer("last_sent_at", { mode: "timestamp_ms" }),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull()
+}, (t) => ({ pair: uniqueIndex("notify_user_org_idx").on(t.userId, t.orgId) }));
+
 /** What a plan allows. Stored rather than coded, so pricing can change without a deploy. */
 export const entitlements = sqliteTable("entitlements", {
   id: id(),

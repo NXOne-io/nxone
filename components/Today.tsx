@@ -1,4 +1,5 @@
 "use client";
+import SetupPrompt from "./SetupPrompt";
 import { ArrowRight, CalendarClock, HandCoins, Sparkles, TrendingDown, Wallet } from "lucide-react";
 import Link from "next/link";
 import { todayView, type TodayItem } from "@/lib/analysis/today";
@@ -36,6 +37,8 @@ export default function Today() {
           {ws.profile?.name ? `, at ${ws.profile.name}` : ""}
         </p>
       </div>
+
+      <SetupPrompt />
 
       <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Cash" value={m(t.cashNow)} strong />
