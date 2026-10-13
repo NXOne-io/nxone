@@ -6,6 +6,7 @@ import { trialBalance } from "@/lib/ledger/journal";
 import { ledgerFor } from "@/lib/ledger/posting";
 import { balanceSheet, cashFlow, profitAndLoss } from "@/lib/ledger/statements";
 import { financialYear, monthPeriod, quarterPeriod, type Period } from "@/lib/store/reports";
+import { openingOf } from "@/lib/ledger/opening";
 import { useHydrated, useWorkspace } from "@/lib/store/useStore";
 
 type Choice = "month" | "quarter" | "year";
@@ -26,7 +27,7 @@ export default function Books() {
 
   const currency = ws.profile?.currency ?? "INR";
   const period: Period = choice === "month" ? monthPeriod(anchor) : choice === "quarter" ? quarterPeriod(anchor) : financialYear(anchor);
-  const ledger = ledgerFor(db.documents(), db.expenses(), currency);
+  const ledger = ledgerFor(db.documents(), db.expenses(), currency, openingOf(ws.profile));
   const pl = profitAndLoss(ledger, currency, period.from, period.to);
   const bs = balanceSheet(ledger, currency, period.to);
   const cf = cashFlow(ledger, currency, period.from, period.to);

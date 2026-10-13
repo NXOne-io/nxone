@@ -1,4 +1,5 @@
 "use client";
+import { openingOf } from "@/lib/ledger/opening";
 import { useState } from "react";
 import { forecast, windowOf } from "@/lib/analysis/cashflow";
 import { formatDate, todayIso } from "@/lib/format";
@@ -16,7 +17,7 @@ export default function CashFlow() {
 
   const currency = ws.profile?.currency ?? "INR";
   const today = todayIso();
-  const f = forecast(db.documents(), db.expenses(), today, currency, 90, minimum * 100);
+  const f = forecast(db.documents(), db.expenses(), today, currency, 90, minimum * 100, openingOf(ws.profile));
   const view = windowOf(f, days);
   const m = (v: { minor: number; currency: string }) => formatMoney(v, "en-IN");
 

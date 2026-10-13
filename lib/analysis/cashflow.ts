@@ -62,15 +62,16 @@ export function forecast(
   today: string,
   currency: string,
   horizonDays = 90,
-  minimumCashMinor = 0
+  minimumCashMinor = 0,
+  opening?: { amountMinor: number; date: string }
 ): Forecast {
   const ledger = ledgerFor(documents, expenses.filter((e) => !e.deletedAt).map((e) => ({
     id: e.id, date: e.date, supplier: e.supplier, description: e.description, category: e.category,
     currency: e.currency, netMinor: e.netMinor, taxMinor: e.taxMinor, paidFrom: e.paidFrom
-  })), currency);
+  })), currency, opening);
 
   const cash = cashFlow(ledger, currency, "1900-01-01", today);
-  const opening = cash.closing.minor;
+  const openingMinor = cash.closing.minor;
 
   // money we are owed, assumed to arrive on its due date, and overdue invoices assumed to arrive soon
   const inflows = new Map<string, number>();
@@ -96,7 +97,7 @@ export function forecast(
   const dailyBurn = Math.round(burn / 30);
 
   const points: CashPoint[] = [];
-  let balance = opening;
+  let balance = openingMinor;
   let runwayDays: number | null = null;
   let dipsBelowOn: string | null = null;
   let totalIn = 0;
@@ -126,7 +127,7 @@ export function forecast(
 
   return {
     currency,
-    openingCash: fromMinor(opening, currency),
+    openingCash: fromMinor(openingMinor, currency),
     points,
     expectedIn: fromMinor(totalIn, currency),
     expectedOut: fromMinor(totalOut, currency),

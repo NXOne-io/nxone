@@ -140,3 +140,53 @@ describe("cash forecast", () => {
     expect(week.closing.minor).toBe(f.points[6].balance.minor);
   });
 });
+
+describe("what you owe", () => {
+  const unpaid = (over: Partial<Expense>): Expense => ({
+    id: Math.random().toString(36).slice(2), date: "2026-06-01", supplier: "WeWork", category: "6010",
+    currency: "INR", netMinor: 5000000, taxMinor: 0, createdAt: "", updatedAt: "", ...over
+  });
+
+  it("counts only bills that are not yet paid", async () => {
+    const { payables } = await import("@/lib/analysis/payables");
+    const view = payables([unpaid({}), unpaid({ paidFrom: "1020" }), unpaid({ deletedAt: "2026-06-02T00:00:00Z" })], TODAY, "INR", 0);
+    expect(toMajor(view.total)).toBe(50000);
+  });
+
+  it("puts older bills first, but does not ignore a small old one", async () => {
+    const { payables } = await import("@/lib/analysis/payables");
+    const view = payables([
+      unpaid({ id: "new-big", date: "2026-06-25", netMinor: 90000000 }),
+      unpaid({ id: "old-small", date: "2026-03-01", netMinor: 100000 })
+    ], TODAY, "INR", 100000000);
+    expect(view.affordable[0].expense.id).toBe("old-small");
+  });
+
+  it("separates what the cash covers from what it does not", async () => {
+    const { payables } = await import("@/lib/analysis/payables");
+    const view = payables([
+      unpaid({ id: "a", netMinor: 3000000, date: "2026-05-01" }),
+      unpaid({ id: "b", netMinor: 3000000, date: "2026-05-02" }),
+      unpaid({ id: "c", netMinor: 3000000, date: "2026-05-03" })
+    ], TODAY, "INR", 7000000);
+    expect(view.affordable).toHaveLength(2);
+    expect(view.beyondCash).toHaveLength(1);
+    expect(toMajor(view.shortfall)).toBe(20000);
+  });
+
+  it("reports no shortfall when the cash covers everything", async () => {
+    const { payables } = await import("@/lib/analysis/payables");
+    expect(payables([unpaid({})], TODAY, "INR", 99999999).shortfall.minor).toBe(0);
+  });
+
+  it("totals by supplier, biggest first", async () => {
+    const { payables } = await import("@/lib/analysis/payables");
+    const view = payables([
+      unpaid({ supplier: "Small Co", netMinor: 100000 }),
+      unpaid({ supplier: "WeWork", netMinor: 5000000 }),
+      unpaid({ supplier: "WeWork", netMinor: 5000000 })
+    ], TODAY, "INR", 0);
+    expect(view.bySupplier[0]).toMatchObject({ supplier: "WeWork", bills: 2 });
+    expect(toMajor(view.bySupplier[0].owed)).toBe(100000);
+  });
+});

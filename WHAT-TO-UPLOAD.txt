@@ -1,57 +1,67 @@
-PHASE 1: onboarding, sample data, email reminders
-=================================================
+PHASE 2: bank statements, receipts, payables, opening balances
+==============================================================
 
 APP, NEW
-  lib/setup/onboarding.ts        answers turned into a configured business
-  lib/setup/demo.ts              a believable business to look at
-  components/Onboarding.tsx      the three-step setup
-  components/DemoControls.tsx    add or clear the sample data
-  components/SetupPrompt.tsx     shown until setup is done, then only when useful
-  components/Notifications.tsx   email reminder settings
-  app/(app)/welcome/page.tsx
-  tests/setup.test.ts            15 tests
+  lib/banking/parse.ts         reading whatever CSV your bank gives you
+  lib/banking/match.ts         working out what each line is
+  lib/receipts/types.ts        the receipt interface, and image shrinking
+  lib/receipts/reader.ts       asks the API, or says it is not connected
+  lib/analysis/payables.ts     what you owe, and what to pay first
+  lib/ledger/opening.ts        the opening balance, in the shape the ledger wants
+  components/BankImport.tsx    the import screen
+  components/Payables.tsx      what you owe
+  app/(app)/bank-import/page.tsx
+  app/(app)/payables/page.tsx
+  tests/banking.test.ts        23 tests
 
 APP, REPLACE
-  components/Sidebar.tsx         "Set up your business" until it is done
-  components/Today.tsx           shows the setup prompt
-  components/Dashboard.tsx       same
-  components/SyncPanel.tsx       honest wording when syncing is paused
-  app/(app)/settings/page.tsx    adds notifications and sample data
-  app/sitemap.ts                 adds the welcome page
-  lib/sync/api.ts                notification endpoints
+  components/Expenses.tsx      attach a bill, read it where possible
+  components/ProfileForm.tsx   what was in the bank when you started
+  components/Sidebar.tsx       adds both screens
+  components/Books.tsx         counts the opening balance
+  components/CashFlow.tsx      same
+  components/Today.tsx         same
+  components/Onboarding.tsx    gives the sample business an opening balance
+  components/DemoControls.tsx  same
+  lib/ledger/posting.ts        posts an opening balance
+  lib/analysis/cashflow.ts     starts from the right number
+  lib/analysis/today.ts        same
+  lib/setup/demo.ts            the demo opening balance
+  lib/store/types.ts           opening balance and receipt on the records
+  app/sitemap.ts               the new pages
+  tests/analysis.test.ts       payables tests
+  tests/ledger.test.ts         opening balance tests
 
 SERVER, NEW
-  server/src/notify/digest.ts            what the weekly email says
-  server/tests/digest.test.ts            7 tests
-  server/migrations/0002_notifications.sql
+  server/src/receipts/read.ts  reading a photographed bill, behind an interface
+  server/tests/receipts.test.ts  10 tests
 
 SERVER, REPLACE
-  server/src/index.ts            preferences, preview, and the scheduled run
-  server/src/db/schema.ts        notification preferences table
-  server/wrangler.jsonc          the weekly schedule
-  server/migrations/meta/        migration bookkeeping
+  server/src/index.ts          the receipts endpoint
 
-AFTER DEPLOYING THE API
-  cd server && npx wrangler d1 migrations apply nxone --remote
+BANK STATEMENTS
+  Upload the CSV your bank gives you. We work out which column is which, and
+  which way round the dates are, by looking at the whole file rather than one
+  row. Money in is matched to invoices by amount, name and invoice number;
+  money out gets a suggested category from the description. Everything is shown
+  with a reason and you confirm before anything is recorded. Lines we cannot
+  read are listed with why, never dropped quietly.
 
-WHAT THESE DO
-  Onboarding: three short questions, then a screen listing what was configured.
-  New visitors are pointed at it instead of landing on an empty dashboard.
+RECEIPTS
+  Attach a photo of a bill to an expense. It is shrunk in the browser and kept
+  with the expense. Reading it automatically needs a service, which is not
+  connected: the app says so plainly rather than leaving the fields empty for no
+  apparent reason. To connect it later:
+      npx wrangler secret put GOOGLE_VISION_KEY
+      set RECEIPT_PROVIDER=google-vision
 
-  Sample data: a made-up business with three customers, six invoices at
-  different ages including two overdue, three months of expenses and a repeating
-  invoice that is due. Clearly marked, and clearing it leaves your own work
-  untouched.
+WHAT YOU OWE
+  Unpaid bills in the order worth settling, with the line drawn where your cash
+  runs out, so you can see the gap rather than discover it at the bank.
 
-  Email reminders: off unless asked for, sent Monday mornings, and never sent
-  when there is nothing to say. There is a preview button so nobody has to wait
-  a week to see what it looks like.
-
-TWO THINGS FIXED ALONG THE WAY
-  The sidebar read local storage while rendering on the server, which caused a
-  hydration error on every page. It now waits for the first paint.
-
-  When syncing is paused because a plan does not include it, the panel used to
-  say "everything here is on your account", which was untrue at exactly the
-  moment it mattered. It now says syncing is paused and the device is the only
-  copy.
+OPENING BALANCES, WHICH TURNED OUT TO MATTER
+  Testing payables showed cash as a large negative number. The cause was real
+  rather than cosmetic: NXOne only knows about money that has passed through it,
+  so a business that existed before looks permanently overdrawn. You can now
+  enter what was in the bank when you started, in your business details, and it
+  posts properly to the ledger as capital.

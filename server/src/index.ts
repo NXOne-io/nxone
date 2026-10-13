@@ -10,6 +10,7 @@ import * as schema from "./db/schema";
 import { emailSender, loginEmail } from "./http/email";
 import { corsHeaders, json, problem, rateLimit } from "./http/respond";
 import { buildDigest, digestEmail } from "./notify/digest";
+import { receiptService } from "./receipts/read";
 import { changesSince, mergePush, type SyncRecord } from "./sync/merge";
 
 export interface Env {
@@ -19,6 +20,9 @@ export interface Env {
   EMAIL_PROVIDER?: string;
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
+  /** Set when a receipt reading service is connected. Without it, the app says so plainly. */
+  RECEIPT_PROVIDER?: string;
+  GOOGLE_VISION_KEY?: string;
   /** Set when a payment provider is connected. Without these, checkout says so plainly. */
   PAYMENT_PROVIDER?: string;
   RAZORPAY_KEY_ID?: string;
@@ -362,6 +366,33 @@ export default {
 
         await audit(db, req, { orgId, action: "billing.webhook", summary: `${event.event ?? "event"} -> ${active ? "active" : "inactive"}` });
         return reply(json({ ok: true }));
+      }
+
+      /* ---------- reading a photographed bill ---------- */
+      if (url.pathname === "/receipts/read" && req.method === "POST") {
+        const found = await currentSession(req, env);
+        if (!found?.session.orgId) return reply(problem(401, "Sign in to have receipts read for you."));
+
+        const service = receiptService(env);
+        if (!service.connected) {
+          return reply(problem(501, "Reading receipts automatically is not connected yet. Attach the photo and type the details, which still keeps the paperwork with the money."));
+        }
+
+        const allowed = await allowance(db, found.session.orgId);
+        if (!allowed?.limits.sync) return reply(problem(402, "Reading receipts is part of Pro."));
+
+        if (!(await rateLimit(env.SESSIONS, `ocr:${found.session.orgId}`, 60, 60 * 60 * 1000))) {
+          return reply(problem(429, "That is a lot of receipts in one hour. Try again shortly."));
+        }
+
+        const { dataUrl } = (await req.json()) as { dataUrl?: string };
+        if (!dataUrl || dataUrl.length > 8_000_000) return reply(problem(400, "Send one image, under about six megabytes."));
+
+        const receipt = await service.read(dataUrl);
+        if (!receipt) return reply(problem(502, "That receipt could not be read. Type the details instead."));
+
+        await audit(db, req, { orgId: found.session.orgId, userId: found.session.userId, action: "receipt.read", summary: service.name });
+        return reply(json(receipt));
       }
 
       /* ---------- what you want to hear about ---------- */

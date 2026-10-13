@@ -120,8 +120,31 @@ export function postBillPayment(input: PaymentInput): JournalEntry {
  * against them produces a receipt entry, so the books follow the documents without double entry
  * of data by the user.
  */
-export function ledgerFor(documents: SavedDocument[], expenses: ExpenseInput[], currency: string): JournalEntry[] {
+/** What was in the bank before NXOne knew anything: money in, owner's capital out. */
+export function postOpeningBalance(amountMinor: number, date: string, currency: string, account = "1020"): JournalEntry {
+  return entry({
+    date,
+    narration: "Opening balance",
+    currency,
+    lines: [
+      { account, debit: amountMinor },
+      { account: "3000", credit: amountMinor }
+    ],
+    source: { kind: "opening" }
+  });
+}
+
+export function ledgerFor(
+  documents: SavedDocument[],
+  expenses: ExpenseInput[],
+  currency: string,
+  opening?: { amountMinor: number; date: string }
+): JournalEntry[] {
   const out: JournalEntry[] = [];
+
+  if (opening && opening.amountMinor > 0) {
+    out.push(postOpeningBalance(opening.amountMinor, opening.date, currency));
+  }
 
   for (const d of documents) {
     if (d.currency !== currency) continue;

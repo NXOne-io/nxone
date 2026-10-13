@@ -17,6 +17,9 @@ export interface Profile extends Syncable {
   signatureDataUrl?: string;
   signatoryName?: string;
   paymentDetails?: string;
+  /** What was in the bank when you started using NXOne, so cash is right from day one. */
+  openingCashMinor?: number;
+  openingCashDate?: string;
   /** What the business is registered for, which decides the filing calendar. */
   registrations?: Registration[];
   /** Indian businesses on the QRMP scheme file GST quarterly rather than monthly. */
@@ -109,6 +112,9 @@ export interface Expense extends Syncable {
   paidFrom?: string;
   /** Bill or receipt number, for matching later. */
   reference?: string;
+  /** The photographed bill, kept with the expense so the paperwork is where the money is. */
+  receiptDataUrl?: string;
+  receiptFileName?: string;
   createdAt: string;
   updatedAt: string;
 }

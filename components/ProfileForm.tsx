@@ -132,6 +132,28 @@ export default function ProfileForm() {
       </section>
 
       <section className="card p-5">
+        <h2 className="font-display text-lg">What you started with</h2>
+        <p className="mt-1 max-w-2xl text-sm text-ink-soft">
+          What was in the bank on the day you started using NXOne. Without it, every cash figure here is out by that amount, since we only know about money that has passed through this app.
+        </p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label" htmlFor="p-opening">Bank balance when you started</label>
+            <input
+              id="p-opening" type="number" step="any" className="field tabular"
+              value={form.openingCashMinor ? form.openingCashMinor / 100 : ""}
+              onChange={(e) => set({ openingCashMinor: e.target.value ? Math.round(Number(e.target.value) * 100) : undefined })}
+              placeholder="0"
+            />
+          </div>
+          <div>
+            <label className="label" htmlFor="p-opening-date">On what date</label>
+            <input id="p-opening-date" type="date" className="field" value={form.openingCashDate ?? ""} onChange={(e) => set({ openingCashDate: e.target.value })} />
+          </div>
+        </div>
+      </section>
+
+      <section className="card p-5">
         <h2 className="font-display text-lg">Numbering</h2>
         <p className="mt-1 text-sm text-ink-soft">The next number for each kind of document. It moves on by itself each time you save one.</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-4">

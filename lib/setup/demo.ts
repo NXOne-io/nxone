@@ -16,6 +16,9 @@ export const DEMO_MARK = "demo";
 
 const consulting = (country: string) => country.toUpperCase() === "IN";
 
+/** What the demo business had in the bank when it started, so cash is believable. */
+export const DEMO_OPENING_MINOR = 60000000;
+
 export function buildDemo(profile: Profile): Pick<Workspace, "clients" | "documents" | "expenses" | "recurring"> {
   const today = todayIso();
   const country = profile.country;

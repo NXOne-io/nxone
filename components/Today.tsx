@@ -1,4 +1,5 @@
 "use client";
+import { openingOf } from "@/lib/ledger/opening";
 import SetupPrompt from "./SetupPrompt";
 import { ArrowRight, CalendarClock, HandCoins, Sparkles, TrendingDown, Wallet } from "lucide-react";
 import Link from "next/link";
@@ -22,7 +23,7 @@ export default function Today() {
   const country = ws.profile?.country ?? "IN";
   const today = todayIso();
   const t = todayView({
-    documents: db.documents(), expenses: db.expenses(), recurring: db.recurring(), today, currency, country,
+    documents: db.documents(), expenses: db.expenses(), recurring: db.recurring(), opening: openingOf(ws.profile), today, currency, country,
     registrations: ws.profile?.registrations ?? [], quarterlyGst: ws.profile?.quarterlyGst
   });
   const m = (v: { minor: number; currency: string }) => formatMoney(v, "en-IN");

@@ -1,7 +1,7 @@
 "use client";
 import { Sparkles, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { buildDemo, hasDemoData, withoutDemo } from "@/lib/setup/demo";
+import { DEMO_OPENING_MINOR, buildDemo, hasDemoData, withoutDemo } from "@/lib/setup/demo";
 import { store } from "@/lib/store/db";
 import { useHydrated, useWorkspace } from "@/lib/store/useStore";
 
@@ -17,6 +17,9 @@ export default function DemoControls() {
   const add = () => {
     if (!ws.profile) { setMessage("Fill in your business details first, so the sample invoices look like yours."); return; }
     const demo = buildDemo(ws.profile);
+    if (!ws.profile.openingCashMinor) {
+      store.saveProfile({ ...ws.profile, openingCashMinor: DEMO_OPENING_MINOR, openingCashDate: demo.expenses[0]?.date });
+    }
     store.apply({
       clients: [...db.raw().clients, ...demo.clients],
       documents: [...db.raw().documents, ...demo.documents],

@@ -115,3 +115,33 @@ describe("the statements", () => {
     expect(withDraft.filter((e) => e.source.kind === "invoice")).toHaveLength(2);
   });
 });
+
+describe("opening balances", () => {
+  it("puts what was already in the bank into the books", async () => {
+    const { postOpeningBalance } = await import("@/lib/ledger/posting");
+    const e = postOpeningBalance(60000000, "2026-01-01", "INR");
+    expect(e.lines.find((l) => l.account === "1020")?.debit).toBe(60000000);
+    expect(e.lines.find((l) => l.account === "3000")?.credit).toBe(60000000);
+  });
+
+  it("keeps the books balanced once it is in", async () => {
+    const { ledgerFor } = await import("@/lib/ledger/posting");
+    const ledger = ledgerFor([], [{ id: "e", date: "2026-02-01", supplier: "Rent", category: "6010", currency: "INR", netMinor: 5000000, paidFrom: "1020" }], "INR", { amountMinor: 60000000, date: "2026-01-01" });
+    expect(trialBalance(ledger, "INR").balanced).toBe(true);
+  });
+
+  it("means cash starts from the right number rather than zero", async () => {
+    const { ledgerFor } = await import("@/lib/ledger/posting");
+    const { cashFlow } = await import("@/lib/ledger/statements");
+    const spend = [{ id: "e", date: "2026-02-01", supplier: "Rent", category: "6010", currency: "INR", netMinor: 5000000, paidFrom: "1020" }];
+    const without = cashFlow(ledgerFor([], spend, "INR"), "INR", "2026-01-01", "2026-12-31");
+    const withOpening = cashFlow(ledgerFor([], spend, "INR", { amountMinor: 60000000, date: "2026-01-01" }), "INR", "2026-01-01", "2026-12-31");
+    expect(toMajor(without.closing)).toBe(-50000);
+    expect(toMajor(withOpening.closing)).toBe(550000);
+  });
+
+  it("ignores an opening balance of nothing", async () => {
+    const { ledgerFor } = await import("@/lib/ledger/posting");
+    expect(ledgerFor([], [], "INR", { amountMinor: 0, date: "2026-01-01" })).toHaveLength(0);
+  });
+});

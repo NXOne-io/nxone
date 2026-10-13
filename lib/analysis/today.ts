@@ -38,6 +38,7 @@ export function todayView(opts: {
   documents: SavedDocument[];
   expenses: Expense[];
   recurring?: RecurringTemplate[];
+  opening?: { amountMinor: number; date: string };
   today: string;
   currency: string;
   country: string;
@@ -45,9 +46,9 @@ export function todayView(opts: {
   quarterlyGst?: boolean;
   businessName?: string;
 }): Today {
-  const { documents, expenses, recurring = [], today, currency, country, registrations, quarterlyGst } = opts;
+  const { documents, expenses, recurring = [], opening, today, currency, country, registrations, quarterlyGst } = opts;
 
-  const f = forecast(documents, expenses, today, currency, 30);
+  const f = forecast(documents, expenses, today, currency, 30, 0, opening);
   const chase = chaseList(documents, today, currency, 3);
   const calendar = calendarFor({ country, registrations, today, backDays: 30, aheadDays: 45, quarterlyGst });
   const unpaidBills = expenses.filter((e) => !e.paidFrom && !e.deletedAt && e.currency === currency);

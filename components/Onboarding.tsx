@@ -3,7 +3,7 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { PACKS, packFor } from "@/lib/countries/packs";
-import { buildDemo } from "@/lib/setup/demo";
+import { DEMO_OPENING_MINOR, buildDemo } from "@/lib/setup/demo";
 import { buildProfile, registrationChoices, type Answers } from "@/lib/setup/onboarding";
 import type { Registration } from "@/lib/compliance/rules";
 import { store } from "@/lib/store/db";
@@ -31,6 +31,8 @@ export default function Onboarding() {
     store.saveProfile(built.profile);
     if (withDemo) {
       const demo = buildDemo(built.profile);
+      // a business with no opening balance looks permanently overdrawn, which is not the point
+      store.saveProfile({ ...built.profile, openingCashMinor: DEMO_OPENING_MINOR, openingCashDate: demo.expenses[0]?.date ?? built.profile.updatedAt?.slice(0, 10) });
       store.apply({
         clients: [...db.raw().clients, ...demo.clients],
         documents: [...db.raw().documents, ...demo.documents],
