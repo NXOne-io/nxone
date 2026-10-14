@@ -1,5 +1,5 @@
 "use client";
-import { BookOpen, Building2, CalendarClock, CalendarSync, Calculator, ChartColumn, FileText, FolderOpen, HandCoins, Landmark, LayoutDashboard, Quote, Receipt, Search, ShoppingCart, Sun, TrendingDown, Wallet, X } from "lucide-react";
+import { BookOpen, Building2, CalendarClock, CalendarSync, Calculator, ChartColumn, FileText, FolderOpen, HandCoins, Landmark, LayoutDashboard, MessageCircleQuestion, Quote, Receipt, Search, ShoppingCart, Sun, TrendingDown, Wallet, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -11,6 +11,7 @@ const GROUPS: Array<{ title: string; items: Array<{ href: string; label: string;
     title: "Overview",
     items: [
       { href: "/today", label: "Today", icon: Sun },
+      { href: "/ask", label: "Ask", icon: MessageCircleQuestion },
       { href: "/dashboard", label: "Your money", icon: LayoutDashboard },
       { href: "/documents", label: "Documents", icon: FolderOpen },
       { href: "/receivables", label: "Owed to you", icon: HandCoins },

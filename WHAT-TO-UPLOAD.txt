@@ -1,67 +1,42 @@
-PHASE 2: bank statements, receipts, payables, opening balances
-==============================================================
+ASK: questions about your money, answered from your own books
+=============================================================
 
-APP, NEW
-  lib/banking/parse.ts         reading whatever CSV your bank gives you
-  lib/banking/match.ts         working out what each line is
-  lib/receipts/types.ts        the receipt interface, and image shrinking
-  lib/receipts/reader.ts       asks the API, or says it is not connected
-  lib/analysis/payables.ts     what you owe, and what to pay first
-  lib/ledger/opening.ts        the opening balance, in the shape the ledger wants
-  components/BankImport.tsx    the import screen
-  components/Payables.tsx      what you owe
-  app/(app)/bank-import/page.tsx
-  app/(app)/payables/page.tsx
-  tests/banking.test.ts        23 tests
+NEW
+  lib/ask/intents.ts     understanding the question
+  lib/ask/answer.ts      answering it from the ledger
+  components/Ask.tsx     the screen
+  app/(app)/ask/page.tsx
+  tests/ask.test.ts      17 tests
 
-APP, REPLACE
-  components/Expenses.tsx      attach a bill, read it where possible
-  components/ProfileForm.tsx   what was in the bank when you started
-  components/Sidebar.tsx       adds both screens
-  components/Books.tsx         counts the opening balance
-  components/CashFlow.tsx      same
-  components/Today.tsx         same
-  components/Onboarding.tsx    gives the sample business an opening balance
-  components/DemoControls.tsx  same
-  lib/ledger/posting.ts        posts an opening balance
-  lib/analysis/cashflow.ts     starts from the right number
-  lib/analysis/today.ts        same
-  lib/setup/demo.ts            the demo opening balance
-  lib/store/types.ts           opening balance and receipt on the records
-  app/sitemap.ts               the new pages
-  tests/analysis.test.ts       payables tests
-  tests/ledger.test.ts         opening balance tests
+REPLACE
+  components/Sidebar.tsx  adds Ask
+  app/sitemap.ts          adds the page
 
-SERVER, NEW
-  server/src/receipts/read.ts  reading a photographed bill, behind an interface
-  server/tests/receipts.test.ts  10 tests
+WHY THERE IS NO AI IN IT
+  An AI CFO normally means sending someone's accounts to a model provider.
+  That costs money per question, gives a different answer each time, and
+  contradicts the promise on your own home page.
 
-SERVER, REPLACE
-  server/src/index.ts          the receipts endpoint
+  People ask about their money in a small number of ways, and those are precise
+  queries rather than language problems. So the questions are matched on the
+  device and answered by the same engine that produces your reports. The result
+  is free, instant, identical every time, and nothing leaves the browser.
 
-BANK STATEMENTS
-  Upload the CSV your bank gives you. We work out which column is which, and
-  which way round the dates are, by looking at the whole file rather than one
-  row. Money in is matched to invoices by amount, name and invoice number;
-  money out gets a suggested category from the description. Everything is shown
-  with a reason and you confirm before anything is recorded. Lines we cannot
-  read are listed with why, never dropped quietly.
+  A model layer can be added later for phrasing and odd questions, with a clear
+  warning that the question is being sent away. That stays your decision.
 
-RECEIPTS
-  Attach a photo of a bill to an expense. It is shrunk in the browser and kept
-  with the expense. Reading it automatically needs a service, which is not
-  connected: the app says so plainly rather than leaving the fields empty for no
-  apparent reason. To connect it later:
-      npx wrangler secret put GOOGLE_VISION_KEY
-      set RECEIPT_PROVIDER=google-vision
+WHAT IT ANSWERS
+  Profit, revenue, expenses and biggest costs, for any period
+  Cash, runway, and whether you can afford a given monthly cost
+  Who owes you, how much is overdue, who is consistently late
+  What you owe suppliers, and whether your cash covers it
+  Tax collected, and when your next filing is due
+  Your biggest customers, and this month against last
 
-WHAT YOU OWE
-  Unpaid bills in the order worth settling, with the line drawn where your cash
-  runs out, so you can see the gap rather than discover it at the bank.
+  Every answer shows what the question was understood to mean, so a misread is
+  obvious, and links to the screen where the figure can be checked. When a
+  question is not understood it says so and offers what it can answer, rather
+  than producing a confident wrong number.
 
-OPENING BALANCES, WHICH TURNED OUT TO MATTER
-  Testing payables showed cash as a large negative number. The cause was real
-  rather than cosmetic: NXOne only knows about money that has passed through it,
-  so a business that existed before looks permanently overdrawn. You can now
-  enter what was in the bank when you started, in your business details, and it
-  posts properly to the ledger as capital.
+STILL TO COME IN THIS PHASE
+  Insights and a daily brief, then the scenario simulator.
