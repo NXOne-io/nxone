@@ -88,7 +88,7 @@ export default async function Page({ params }: Props) {
 
         <section className="mt-10 rounded-xl border border-forest bg-forest-pale p-6">
           <h2 className="font-display text-2xl">Make one now</h2>
-          <p className="mt-2 max-w-xl text-ink-soft">The generator sets the currency, the tax rules and the document layout for {pack.name} as soon as you pick it. Free, no account, and nothing is uploaded.</p>
+          <p className="mt-2 max-w-xl text-ink-soft">The generator sets the currency, the tax rules and the document layout for {pack.name} as soon as you pick it. Free, and it works without an account.</p>
           <Link href={`/invoice-generator?country=${pack.code}`} className="btn-primary mt-4">Create a {g.docName}</Link>
         </section>
 

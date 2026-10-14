@@ -15,7 +15,7 @@ export default function Home() {
       <section className="wrap py-14 sm:py-20">
         <p className="chip">Free, no sign-up</p>
         <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.05] sm:text-6xl">Send an invoice your accountant will not send back.</h1>
-        <p className="mt-5 max-w-2xl text-lg text-ink-soft">Invoices, quotations, purchase orders and receipts, with the tax worked out for the country you sell from. It runs in your browser, so your prices and your customer list stay on your own machine.</p>
+        <p className="mt-5 max-w-2xl text-lg text-ink-soft">Invoices, quotations, purchase orders and receipts, with the tax worked out for the country you sell from. Your documents are built in your browser, and a free account keeps a copy safe and your devices in step. Your data is yours, and leaves whenever you want it to.</p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/invoice-generator" className="btn-primary px-6 py-3 text-base">Create an invoice</Link>
           <Link href="/quotation-generator" className="btn-ghost px-6 py-3 text-base">Start a quotation</Link>

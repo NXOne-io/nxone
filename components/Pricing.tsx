@@ -9,22 +9,23 @@ const FALLBACK: { country: string; plans: PlanOffer[] } = {
   country: "IN",
   plans: [
     {
-      id: "free", name: "Free", summary: "Everything on one device, for as long as you like.",
-      limits: { users: 1, devices: 1, records: null, sync: false },
+      id: "free", name: "Free", summary: "The whole product, with your work kept safe.",
+      limits: { users: 1, devices: null, records: 2000, sync: true },
       price: { currency: "INR", monthlyMinor: 0, yearlyMinor: 0 },
       features: [
         "Unlimited invoices, quotations, purchase orders and receipts",
         "Tax worked out for your country, including GST with HSN codes",
         "Customers, items, expenses and the full accounts",
         "Reports and the CSV for your accountant",
-        "Everything stays on your device"
+        "A copy held for you, so a lost laptop is not a lost year",
+        "The same work on your laptop and your phone"
       ]
     },
     {
-      id: "pro", name: "Pro", summary: "The same work on your laptop and your phone.",
-      limits: { users: 1, devices: null, records: 50000, sync: true },
+      id: "pro", name: "Pro", summary: "The chasing and the paperwork, done for you.",
+      limits: { users: 1, devices: null, records: null, sync: true },
       price: { currency: "INR", monthlyMinor: 59900, yearlyMinor: 599900 },
-      features: ["Everything in Free", "Your work on every device you use", "A copy held for you, so a lost laptop is not a lost year", "Export everything whenever you want"]
+      features: ["Everything in Free", "Email reminders when invoices go overdue, which arrive whether or not you open the app", "Photograph a bill and have it read into an expense", "No limit on how much we hold for you", "Export everything whenever you want"]
     },
     {
       id: "business", name: "Business", summary: "For two people, and anyone else you add.",
@@ -117,7 +118,7 @@ export default function Pricing() {
       </div>
 
       <p className="mt-6 max-w-2xl text-sm text-ink-soft">
-        The trial needs no card, and nothing is taken away when it ends: you keep working on this device exactly as before, and the copy held for you waits until you decide. Prices shown for {data.country === "IN" ? "India" : "outside India"}.
+        The trial needs no card. When it ends your work stays exactly where it is, in the copy we hold and on your devices: only the reminders and the bill reading stop. Prices shown for {data.country === "IN" ? "India" : "outside India"}.
       </p>
     </div>
   );

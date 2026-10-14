@@ -1,5 +1,5 @@
 "use client";
-import { ArrowRight, Check, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Mail, Shield, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { PACKS, packFor } from "@/lib/countries/packs";
@@ -9,11 +9,16 @@ import type { Registration } from "@/lib/compliance/rules";
 import { store } from "@/lib/store/db";
 import { useWorkspace } from "@/lib/store/useStore";
 import { guessCountry } from "@/lib/format";
+import { syncAvailable } from "@/lib/sync/api";
+import { sync } from "@/lib/sync/engine";
 
 /** Three short steps. Anything we can work out ourselves is not asked. */
 export default function Onboarding() {
   const [, db] = useWorkspace();
-  const [step, setStep] = useState<1 | 2 | 3 | "done">(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4 | "done">(1);
+  const [accountEmail, setAccountEmail] = useState("");
+  const [accountState, setAccountState] = useState<"idle" | "sent" | "skipped" | "error">("idle");
+  const [accountMessage, setAccountMessage] = useState("");
   const [answers, setAnswers] = useState<Answers>(() => ({
     country: typeof window === "undefined" ? "IN" : guessCountry(),
     businessName: "",
@@ -25,6 +30,12 @@ export default function Onboarding() {
   const set = (patch: Partial<Answers>) => setAnswers((a) => ({ ...a, ...patch }));
   const toggle = (r: Registration) =>
     set({ registrations: answers.registrations.includes(r) ? answers.registrations.filter((x) => x !== r) : [...answers.registrations, r] });
+
+  const requestAccount = async () => {
+    const result = await sync.signIn(accountEmail);
+    if (result.ok) { setAccountState("sent"); setAccountMessage(""); }
+    else { setAccountState("error"); setAccountMessage(result.error); }
+  };
 
   const finish = (withDemo: boolean) => {
     const built = buildProfile(answers);
@@ -41,8 +52,49 @@ export default function Onboarding() {
       });
     }
     setSummary(built);
-    setStep("done");
+    setStep(syncAvailable() ? 4 : "done");
   };
+
+  if (step === 4 && summary) {
+    return (
+      <div className="card max-w-2xl p-6 sm:p-8">
+        <h2 className="flex items-center gap-2 font-display text-2xl"><Shield size={20} className="text-forest" />Keep a copy safe</h2>
+        <p className="mt-2 text-ink-soft">
+          Everything you make lives in this browser. That is private, and it is also the only copy: clearing your browser data would take your invoices with it.
+        </p>
+        <p className="mt-3 text-ink-soft">
+          An account holds a copy for you and keeps your laptop and your phone in step. It is free, there is no card, and you can export or delete everything whenever you like.
+        </p>
+
+        {accountState === "sent" ? (
+          <div className="mt-5 rounded-lg border border-forest bg-forest-pale p-4">
+            <p className="flex items-center gap-2 font-semibold"><Mail size={16} />Check your email</p>
+            <p className="mt-1 text-sm text-ink-soft">A link is on its way to {accountEmail}. Open it on this device and your work starts being held for you.</p>
+          </div>
+        ) : (
+          <div className="mt-5 flex flex-wrap gap-2">
+            <input
+              className="field max-w-xs" type="email" value={accountEmail}
+              onChange={(e) => setAccountEmail(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") void requestAccount(); }}
+              placeholder="you@yourbusiness.com" aria-label="Your email address"
+            />
+            <button type="button" className="btn-primary" disabled={!accountEmail.includes("@")} onClick={requestAccount}>Send me a link</button>
+          </div>
+        )}
+        {accountMessage ? <p className="mt-3 text-sm text-bad">{accountMessage}</p> : null}
+
+        <div className="mt-6 border-t border-line pt-4">
+          <button type="button" className="btn-quiet" onClick={() => { setAccountState("skipped"); setStep("done"); }}>
+            Use this device only
+          </button>
+          <p className="mt-2 max-w-xl text-xs text-ink-faint">
+            Nothing is held for you and nothing is sent anywhere. Take a backup now and then from your business details, because this browser is the only copy.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (step === "done" && summary) {
     return (
@@ -57,6 +109,12 @@ export default function Onboarding() {
             </li>
           ))}
         </ul>
+        {accountState === "skipped" ? (
+          <p className="mt-5 rounded-lg border border-line bg-canvas p-3 text-sm text-ink-soft">
+            You are working on this device only. If you change your mind, there is a sign in link in your business details.
+          </p>
+        ) : null}
+
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/invoice-generator/?new=1" className="btn-primary">Make your first invoice</Link>
           <Link href="/today/" className="btn-ghost">See Today</Link>

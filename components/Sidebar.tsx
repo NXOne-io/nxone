@@ -107,7 +107,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
 
         <div className="border-t border-line p-3">
           <p className="rounded-lg bg-forest-pale p-3 text-xs text-ink-soft">
-            Everything is worked out on this device. Nothing you type is uploaded.
+            Worked out on this device. With an account, a copy is held for you and your devices stay in step.
           </p>
         </div>
       </aside>

@@ -15,7 +15,7 @@ export default function Footer() {
       <div className="wrap grid gap-10 py-12 md:grid-cols-[1.2fr_2fr]">
         <div>
           <Logo />
-          <p className="mt-3 max-w-xs text-sm text-ink-soft">{BRAND.tagline}. Documents are built in your browser, so your customer and pricing data stays on your device.</p>
+          <p className="mt-3 max-w-xs text-sm text-ink-soft">{BRAND.tagline}. Documents are built in your browser, and your data stays yours: export or delete it whenever you like.</p>
         </div>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {GROUPS.map(([title, links]) => (

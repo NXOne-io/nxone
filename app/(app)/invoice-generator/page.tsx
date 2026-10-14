@@ -2,7 +2,7 @@ import Builder from "@/components/builder/Builder";
 
 export const metadata = {
   title: "Free Invoice Generator - GST, VAT and Sales Tax Invoices",
-  description: "Create a professional invoice with the correct tax format for India, the UK, US, UAE, Singapore, Australia or Canada. Free, no sign-up, and nothing is uploaded."
+  description: "Create a professional invoice with the correct tax format for India, the UK, US, UAE, Singapore, Australia or Canada. Free, no sign-up needed, and your documents are built in your browser."
 };
 
 export default function Page() {

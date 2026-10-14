@@ -102,6 +102,10 @@ export default {
       const lastSent = row.prefs.lastSentAt?.getTime() ?? 0;
       if (Date.now() - lastSent < 20 * 60 * 60 * 1000) continue;
 
+      // reminders are part of Pro, so a lapsed plan simply stops sending rather than failing
+      const org = (await db.select().from(schema.organisations).where(eq(schema.organisations.id, row.prefs.orgId)).limit(1))[0];
+      if (!org || !entitlementsFor(org.plan, org.trialEndsAt?.getTime() ?? null).limits.reminders) continue;
+
       const digest = await digestFor(db, row.prefs.orgId, today);
       if (!digest.worthSending) continue;
 
@@ -236,9 +240,6 @@ export default {
         if (!found?.session.orgId) return reply(problem(401, "Not signed in."));
         if (!(await membership(db, found.session.userId, found.session.orgId))) return reply(problem(403, "You do not have access to that organisation."));
 
-        const allowed = await allowance(db, found.session.orgId);
-        if (!allowed?.limits.sync) return reply(problem(402, "Syncing is part of Pro. Your work is safe on your device, and nothing has been lost.", { plan: allowed?.plan.id ?? "free" }));
-
         const since = Number(url.searchParams.get("since") ?? 0);
         const rows = await db.select().from(schema.records)
           .where(and(eq(schema.records.orgId, found.session.orgId), gt(schema.records.updatedAt, new Date(since))))
@@ -260,8 +261,6 @@ export default {
         if (member.role === "readonly") return reply(problem(403, "Your access to this organisation is read only."));
 
         const allowed = await allowance(db, found.session.orgId);
-        if (!allowed?.limits.sync) return reply(problem(402, "Syncing is part of Pro. Your work is safe on your device, and nothing has been lost.", { plan: allowed?.plan.id ?? "free" }));
-
         const { records } = (await req.json()) as { records: SyncRecord[] };
         if (!Array.isArray(records) || records.length > 500) return reply(problem(400, "Send up to 500 records at a time."));
         if (records.length === 0) return reply(json({ applied: [], rejected: [], cursor: Date.now() }));
@@ -275,6 +274,18 @@ export default {
           updatedAt: r.updatedAt.getTime(), deletedAt: r.deletedAt?.getTime() ?? null
         }]));
         const byKeyId = new Map(existingRows.map((r) => [`${r.kind}:${r.localId}`, r.id]));
+
+        /**
+         * A free account is held, but not without limit. We refuse politely and say how to lift
+         * it, rather than failing silently and leaving somebody's work on one device.
+         */
+        if (allowed?.limits.records !== null && allowed?.limits.records !== undefined) {
+          const held = await db.select({ id: schema.records.id }).from(schema.records).where(eq(schema.records.orgId, orgId));
+          const newOnes = records.filter((r) => !existing.has(`${r.kind}:${r.localId}`)).length;
+          if (held.length + newOnes > allowed.limits.records) {
+            return reply(problem(402, `A free account holds up to ${allowed.limits.records} records, and this would go past that. Everything stays safe on your device, and Pro removes the limit.`, { plan: allowed.plan.id, held: held.length, limit: allowed.limits.records }));
+          }
+        }
 
         const result = mergePush(records, existing);
         const at = new Date();
@@ -379,7 +390,9 @@ export default {
         }
 
         const allowed = await allowance(db, found.session.orgId);
-        if (!allowed?.limits.sync) return reply(problem(402, "Reading receipts is part of Pro."));
+        if (!allowed?.limits.receiptReading) {
+          return reply(problem(402, "Reading a bill from a photograph is part of Pro. You can still attach the photo and type the details.", { plan: allowed?.plan.id ?? "free" }));
+        }
 
         if (!(await rateLimit(env.SESSIONS, `ocr:${found.session.orgId}`, 60, 60 * 60 * 1000))) {
           return reply(problem(429, "That is a lot of receipts in one hour. Try again shortly."));
@@ -402,7 +415,11 @@ export default {
         const orgId = found.session.orgId;
 
         if (req.method === "POST") {
+          const allowed = await allowance(db, orgId);
           const body = (await req.json()) as { weeklyDigest?: boolean; overdueAlerts?: boolean };
+          if ((body.weeklyDigest || body.overdueAlerts) && !allowed?.limits.reminders) {
+            return reply(problem(402, "Email reminders are part of Pro.", { plan: allowed?.plan.id ?? "free" }));
+          }
           const existing = (await db.select().from(schema.notificationPrefs)
             .where(and(eq(schema.notificationPrefs.userId, found.session.userId), eq(schema.notificationPrefs.orgId, orgId))).limit(1))[0];
 
@@ -420,7 +437,15 @@ export default {
 
         const row = (await db.select().from(schema.notificationPrefs)
           .where(and(eq(schema.notificationPrefs.userId, found.session.userId), eq(schema.notificationPrefs.orgId, orgId))).limit(1))[0];
-        return reply(json({ weeklyDigest: row?.weeklyDigest ?? false, overdueAlerts: row?.overdueAlerts ?? false, lastSentAt: row?.lastSentAt?.getTime() ?? null }));
+        const plan = await allowance(db, orgId);
+        return reply(json({
+          weeklyDigest: row?.weeklyDigest ?? false,
+          overdueAlerts: row?.overdueAlerts ?? false,
+          lastSentAt: row?.lastSentAt?.getTime() ?? null,
+          allowed: plan?.limits.reminders ?? false,
+          plan: plan?.plan.id ?? "free",
+          trialing: plan?.trialing ?? false
+        }));
       }
 
       /* ---------- a preview, so nobody has to wait a week to see what it says ---------- */

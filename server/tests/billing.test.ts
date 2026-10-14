@@ -3,10 +3,16 @@ import { PLANS, entitlementsFor, planById, priceFor } from "@/billing/plans";
 import { RazorpayProvider, UnconnectedProvider, paymentProvider } from "@/billing/provider";
 
 describe("plans", () => {
-  it("keeps everything local free, and charges only for syncing", () => {
-    expect(planById("free").limits.sync).toBe(false);
-    expect(planById("pro").limits.sync).toBe(true);
-    expect(planById("free").features.join(" ")).toMatch(/Unlimited invoices/);
+  it("holds a free account's work too, because losing someone's books loses the person", () => {
+    expect(planById("free").limits.sync).toBe(true);
+    expect(planById("free").limits.records).toBe(2000);
+    expect(planById("pro").limits.records).toBeNull();
+  });
+  it("charges for what costs money to run, rather than for safety", () => {
+    expect(planById("free").limits.reminders).toBe(false);
+    expect(planById("free").limits.receiptReading).toBe(false);
+    expect(planById("pro").limits.reminders).toBe(true);
+    expect(planById("pro").limits.receiptReading).toBe(true);
   });
   it("prices India in rupees and everywhere else in dollars", () => {
     expect(priceFor(planById("pro"), "IN")).toMatchObject({ currency: "INR", monthlyMinor: 59900, yearlyMinor: 599900 });
@@ -35,10 +41,11 @@ describe("what an organisation may do", () => {
     expect(e.trialing).toBe(true);
     expect(e.limits.sync).toBe(true);
   });
-  it("drops back to free when the trial ends, without losing anything", () => {
+  it("drops back to free when the trial ends, keeping the work safe and stopping only the paid parts", () => {
     const e = entitlementsFor("free", Date.now() - 1000);
     expect(e.trialing).toBe(false);
-    expect(e.limits.sync).toBe(false);
+    expect(e.limits.sync).toBe(true);
+    expect(e.limits.reminders).toBe(false);
     expect(e.plan.features.join(" ")).toMatch(/Unlimited invoices/);
   });
   it("leaves a paying organisation alone whatever the trial says", () => {

@@ -1,42 +1,59 @@
-ASK: questions about your money, answered from your own books
-=============================================================
+PLANS REWORKED, COPY CORRECTED, AND INSIGHTS
+============================================
 
-NEW
-  lib/ask/intents.ts     understanding the question
-  lib/ask/answer.ts      answering it from the ledger
-  components/Ask.tsx     the screen
-  app/(app)/ask/page.tsx
-  tests/ask.test.ts      17 tests
+THE CHANGE YOU ASKED FOR
+  Free now includes an account, a held copy of your work, and syncing across
+  your devices, up to 2,000 records. Losing somebody's books because they
+  cleared their browser would lose the person permanently, and holding a few
+  thousand small records costs us almost nothing.
 
-REPLACE
-  components/Sidebar.tsx  adds Ask
-  app/sitemap.ts          adds the page
+  Pro is now what actually costs money to run: email reminders that arrive
+  whether or not you open the app, and reading a photographed bill. Plus no
+  limit on what is held.
 
-WHY THERE IS NO AI IN IT
-  An AI CFO normally means sending someone's accounts to a model provider.
-  That costs money per question, gives a different answer each time, and
-  contradicts the promise on your own home page.
+  Onboarding has a fourth step offering an account, with "use this device only"
+  as a visible alternative rather than a hidden one.
 
-  People ask about their money in a small number of ways, and those are precise
-  queries rather than language problems. So the questions are matched on the
-  device and answered by the same engine that produces your reports. The result
-  is free, instant, identical every time, and nothing leaves the browser.
+THE COPY HAD TO CHANGE WITH IT
+  "Nothing ever leaves your device" stopped being true the moment most people
+  have an account. Every such claim has been corrected, in the home page, the
+  layout description, the footer, the sidebar, two tool pages and the privacy
+  policy, which now says plainly what is held, why, and what is never done with
+  it. This matters more than it looks: a privacy claim that quietly stops being
+  true is the kind of thing that ends a company's reputation in one article.
 
-  A model layer can be added later for phrasing and odd questions, with a clear
-  warning that the question is being sent away. That stays your decision.
+SERVER, REPLACE
+  server/src/billing/plans.ts   the new shape of the plans
+  server/src/index.ts           enforcement follows it: sync open, paid parts checked
+  server/tests/billing.test.ts
 
-WHAT IT ANSWERS
-  Profit, revenue, expenses and biggest costs, for any period
-  Cash, runway, and whether you can afford a given monthly cost
-  Who owes you, how much is overdue, who is consistently late
-  What you owe suppliers, and whether your cash covers it
-  Tax collected, and when your next filing is due
-  Your biggest customers, and this month against last
+APP, NEW
+  lib/insights/engine.ts        what changed, and why we think so
+  components/Insights.tsx       the screen piece
+  tests/insights.test.ts        12 tests
 
-  Every answer shows what the question was understood to mean, so a misread is
-  obvious, and links to the screen where the figure can be checked. When a
-  question is not understood it says so and offers what it can answer, rather
-  than producing a confident wrong number.
+APP, REPLACE
+  components/Onboarding.tsx     the account step
+  components/Today.tsx          the brief and the top insights
+  components/Dashboard.tsx      the full set
+  components/Pricing.tsx        matches the new plans
+  components/Footer.tsx         corrected copy
+  components/Sidebar.tsx        corrected copy
+  components/builder/Editor.tsx corrected copy
+  content/legal.tsx             the privacy policy, rewritten honestly
+  app/(site)/page.tsx           corrected copy
+  app/(site)/pricing/page.tsx   explains the new split
+  app/(site)/invoice-format/[country]/page.tsx   corrected copy
+  app/(app)/invoice-generator/page.tsx           corrected copy
+  app/layout.tsx                corrected description
 
-STILL TO COME IN THIS PHASE
-  Insights and a daily brief, then the scenario simulator.
+INSIGHTS
+  Income and margin movements, costs that jumped, customers who pay late, one
+  customer holding too much of what you are owed, cash running out, overdue
+  money that dwarfs your bank balance, and invoices left as drafts.
+
+  Each one carries the figures it came from, because "margin is down" is
+  useless without the two numbers behind it. Nothing appears unless it passes a
+  threshold: a 2% wobble is not an insight.
+
+NO MIGRATION NEEDED

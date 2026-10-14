@@ -1,4 +1,5 @@
 "use client";
+import Insights from "./Insights";
 import { openingOf } from "@/lib/ledger/opening";
 import SetupPrompt from "./SetupPrompt";
 import { ArrowRight, CalendarClock, HandCoins, Sparkles, TrendingDown, Wallet } from "lucide-react";
@@ -51,6 +52,8 @@ export default function Today() {
           sub={t.nextDeadline ? `${formatDate(t.nextDeadline.dueDate, country)}, in ${t.nextDeadline.daysAway} days` : "Tell us what you are registered for"}
         />
       </dl>
+
+      <Insights limit={3} brief />
 
       {t.items.length === 0 ? (
         <div className="card p-8 text-center">

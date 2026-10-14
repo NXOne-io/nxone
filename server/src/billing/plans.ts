@@ -30,7 +30,12 @@ export interface Plan {
     devices: number | null;
     /** Records the server will hold. Null means no limit. */
     records: number | null;
+    /** Whether a copy is held and kept in step across devices. */
     sync: boolean;
+    /** Email reminders, which cost us something to send and need a schedule running. */
+    reminders: boolean;
+    /** Reading a photographed bill, which is billed per request by the service that does it. */
+    receiptReading: boolean;
   };
   features: string[];
 }
@@ -39,30 +44,38 @@ export const PLANS: Plan[] = [
   {
     id: "free",
     name: "Free",
-    summary: "Everything on one device, for as long as you like.",
+    summary: "The whole product, with your work kept safe.",
     prices: { default: { currency: "USD", monthlyMinor: 0, yearlyMinor: 0 }, IN: { currency: "INR", monthlyMinor: 0, yearlyMinor: 0 } },
-    limits: { users: 1, devices: 1, records: null, sync: false },
+    /**
+     * Free includes a held copy and syncing. Losing somebody's books because they cleared their
+     * browser would lose the person permanently, and storing a few thousand small records costs
+     * us almost nothing. What is paid for is what costs money to run: sending email and reading
+     * photographs.
+     */
+    limits: { users: 1, devices: null, records: 2000, sync: true, reminders: false, receiptReading: false },
     features: [
       "Unlimited invoices, quotations, purchase orders and receipts",
       "Tax worked out for your country, including GST with HSN codes",
       "Customers, items, expenses and the full accounts",
       "Reports and the CSV for your accountant",
-      "Everything stays on your device"
+      "A copy held for you, so a lost laptop is not a lost year",
+      "The same work on your laptop and your phone"
     ]
   },
   {
     id: "pro",
     name: "Pro",
-    summary: "The same work on your laptop and your phone.",
+    summary: "The chasing and the paperwork, done for you.",
     prices: {
       IN: { currency: "INR", monthlyMinor: 59900, yearlyMinor: 599900 },
       default: { currency: "USD", monthlyMinor: 999, yearlyMinor: 9900 }
     },
-    limits: { users: 1, devices: null, records: 50000, sync: true },
+    limits: { users: 1, devices: null, records: null, sync: true, reminders: true, receiptReading: true },
     features: [
       "Everything in Free",
-      "Your work on every device you use",
-      "A copy held for you, so a lost laptop is not a lost year",
+      "Email reminders when invoices go overdue, which arrive whether or not you open the app",
+      "Photograph a bill and have it read into an expense",
+      "No limit on how much we hold for you",
       "Export everything whenever you want"
     ]
   },
@@ -74,7 +87,7 @@ export const PLANS: Plan[] = [
       IN: { currency: "INR", monthlyMinor: 99900, yearlyMinor: 999900, extraUserMonthlyMinor: 39900 },
       default: { currency: "USD", monthlyMinor: 1999, yearlyMinor: 19900, extraUserMonthlyMinor: 900 }
     },
-    limits: { users: 2, devices: null, records: null, sync: true },
+    limits: { users: 2, devices: null, records: null, sync: true, reminders: true, receiptReading: true },
     features: [
       "Everything in Pro",
       "Two people included, each with their own sign in",

@@ -146,7 +146,7 @@ export default function Editor({ doc, totals, update, updateItem, addItem, remov
             <span className="label">Logo</span>
             <div className="flex flex-wrap items-center gap-3">
               <label className="btn-ghost cursor-pointer">Choose image<input type="file" accept="image/png,image/jpeg" className="sr-only" onChange={(e) => onLogo(e.target.files?.[0])} /></label>
-              {doc.logoDataUrl ? <button type="button" className="btn-quiet" onClick={() => update({ logoDataUrl: undefined })}>Remove logo</button> : <span className="text-sm text-ink-faint">PNG or JPG. It stays on your device and goes straight into the PDF.</span>}
+              {doc.logoDataUrl ? <button type="button" className="btn-quiet" onClick={() => update({ logoDataUrl: undefined })}>Remove logo</button> : <span className="text-sm text-ink-faint">PNG or JPG. It goes straight into the PDF.</span>}
             </div>
           </div>
         </div>

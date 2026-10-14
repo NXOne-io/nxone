@@ -14,10 +14,14 @@ export const LEGAL: LegalPage[] = [
     Body: () => (
       <>
         <h2>The short version</h2>
-        <p>Your invoices, customers, prices and logo stay in your browser. There is no upload, no account and no database holding your business data. We could not show you your own invoice if you asked us to, because we never had it.</p>
+        <p>Your documents are built in your browser. If you create an account, a copy of your records is held so that nothing is lost and your devices stay in step. If you do not, nothing is sent anywhere at all. Either way the data is yours: export it or delete it whenever you like, and we never sell it or hand it to advertisers.</p>
 
-        <h2>What stays on your device</h2>
-        <p>Everything you type into a document, along with your logo and signature, is held in your browser&apos;s local storage so that closing the tab does not lose your work. It sits on your computer or phone and is readable only by this site in that browser. Clearing your browser data removes it. Pressing Start over removes it too.</p>
+        <h2>What is on your device</h2>
+        <p>Everything you type into a document, along with your logo and signature, is held in your browser&apos;s local storage so that closing the tab does not lose your work. Clearing your browser data removes it, which is why we offer an account and a backup file.</p>
+
+        <h2>What we hold when you have an account</h2>
+        <p>Your invoices, customers, items, expenses and business details, as you saved them, plus your email address. We hold them so a second device can catch up and so a lost laptop is not a lost year. Tax is still worked out on your device, not ours.</p>
+        <p>We do not look at your records except where you ask us to: the weekly summary email is assembled from them, and a photographed bill is passed to a reading service only when you attach one and your plan includes that. Nothing is used to train anything.</p>
 
         <h2>What we do collect</h2>
         <p>Like most websites we use analytics to understand which pages are visited and roughly where visitors come from. That covers pages viewed, approximate location by country or city, device type and browser. It does not include anything you type into a document.</p>
@@ -25,10 +29,10 @@ export const LEGAL: LegalPage[] = [
 
         <h2>What we never do</h2>
         <ul>
-          <li>Send your document contents anywhere</li>
-          <li>Sell or share your information with data brokers</li>
-          <li>Ask you to create an account to use the tools</li>
-          <li>Keep copies of anything you download</li>
+          <li>Sell or share your information with data brokers or advertisers</li>
+          <li>Require an account: the whole product works without one</li>
+          <li>Use your records to train anything</li>
+          <li>Keep your data after you ask us to delete it</li>
         </ul>
 
         <h2>Fonts and files loaded from elsewhere</h2>
@@ -38,7 +42,7 @@ export const LEGAL: LegalPage[] = [
         <p>This is a tool for businesses and is not directed at children.</p>
 
         <h2>Your rights</h2>
-        <p>Because we do not hold your business data, most data requests have nothing to act on. For analytics information, or any question at all, write to <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a>.</p>
+        <p>You can export everything we hold at any time, from your business details, as a file you keep. You can ask us to delete your account and everything in it, and we will. If you have never signed in, we hold nothing of yours to begin with. For anything else, write to <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a>.</p>
 
         <h2>Changes</h2>
         <p>If this policy changes in a way that matters, the date at the top will change with it.</p>

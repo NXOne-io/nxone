@@ -1,4 +1,5 @@
 "use client";
+import Insights from "./Insights";
 import SetupPrompt from "./SetupPrompt";
 import { ArrowRight, FileText, Quote, Receipt, ShoppingCart, TriangleAlert } from "lucide-react";
 import Link from "next/link";
@@ -103,6 +104,8 @@ export default function Dashboard() {
           ) : null}
         </section>
       ) : null}
+
+      <Insights />
 
       <DocumentList limit={6} title="Recent documents" />
     </div>
