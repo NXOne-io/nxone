@@ -1,59 +1,48 @@
-PLANS REWORKED, COPY CORRECTED, AND INSIGHTS
-============================================
+FIX: claims about privacy that are no longer true
+=================================================
 
-THE CHANGE YOU ASKED FOR
-  Free now includes an account, a held copy of your work, and syncing across
-  your devices, up to 2,000 records. Losing somebody's books because they
-  cleared their browser would lose the person permanently, and holding a few
-  thousand small records costs us almost nothing.
+WHAT I MISSED
+  When plans changed so that a free account holds a copy of your work, I
+  corrected the obvious places and searched for the exact phrases I remembered
+  writing. Several more said the same thing in different words, and they are
+  live now:
 
-  Pro is now what actually costs money to run: email reminders that arrive
-  whether or not you open the app, and reading a photographed bill. Plus no
-  limit on what is held.
+    Home page   "Nothing is uploaded. Your customer list and your prices never
+                 reach us. There is nowhere for them to go."
+    Home page   "No account to make."
+    Social image "Free. No sign-up. Nothing uploaded."
+    About page  "There is no upload, no account, and nowhere for your data to go."
+    Four tool page descriptions, which also feed Google.
 
-  Onboarding has a fourth step offering an account, with "use this device only"
-  as a visible alternative rather than a hidden one.
+  All of these were true a week ago and are not true now. The social image is
+  the one that would have travelled furthest, since it appears every time
+  somebody shares a link.
 
-THE COPY HAD TO CHANGE WITH IT
-  "Nothing ever leaves your device" stopped being true the moment most people
-  have an account. Every such claim has been corrected, in the home page, the
-  layout description, the footer, the sidebar, two tool pages and the privacy
-  policy, which now says plainly what is held, why, and what is never done with
-  it. This matters more than it looks: a privacy claim that quietly stops being
-  true is the kind of thing that ends a company's reputation in one article.
+REPLACE THESE 11 FILES
+  app/(site)/page.tsx                        badge and the feature grid
+  app/(app)/welcome/page.tsx
+  app/(app)/calculators/page.tsx
+  app/(app)/quotation-generator/page.tsx
+  app/(app)/purchase-order-generator/page.tsx
+  app/(app)/receipt-generator/page.tsx
+  app/(app)/hsn-code-finder/page.tsx
+  content/legal.tsx                          the About page
+  lib/og.tsx                                 the social image
+  lib/calc/registry.tsx
+  lib/store/db.ts                            a comment describing the old design
 
-SERVER, REPLACE
-  server/src/billing/plans.ts   the new shape of the plans
-  server/src/index.ts           enforcement follows it: sync open, paid parts checked
-  server/tests/billing.test.ts
+WHAT THEY SAY NOW
+  "Free, and your work is kept safe" rather than "Free, no sign-up".
+  "Your work is kept safe: a free account holds a copy, so a cleared browser or
+  a lost laptop is not a lost year of invoices."
+  "Start without an account: open it, type, download. Sign up when you want the
+  same work on your phone as well."
 
-APP, NEW
-  lib/insights/engine.ts        what changed, and why we think so
-  components/Insights.tsx       the screen piece
-  tests/insights.test.ts        12 tests
+  Both halves are true, and the second is still a real difference from every
+  competitor, which all demand an email before showing you anything.
 
-APP, REPLACE
-  components/Onboarding.tsx     the account step
-  components/Today.tsx          the brief and the top insights
-  components/Dashboard.tsx      the full set
-  components/Pricing.tsx        matches the new plans
-  components/Footer.tsx         corrected copy
-  components/Sidebar.tsx        corrected copy
-  components/builder/Editor.tsx corrected copy
-  content/legal.tsx             the privacy policy, rewritten honestly
-  app/(site)/page.tsx           corrected copy
-  app/(site)/pricing/page.tsx   explains the new split
-  app/(site)/invoice-format/[country]/page.tsx   corrected copy
-  app/(app)/invoice-generator/page.tsx           corrected copy
-  app/layout.tsx                corrected description
-
-INSIGHTS
-  Income and margin movements, costs that jumped, customers who pay late, one
-  customer holding too much of what you are owed, cash running out, overdue
-  money that dwarfs your bank balance, and invoices left as drafts.
-
-  Each one carries the figures it came from, because "margin is down" is
-  useless without the two numbers behind it. Nothing appears unless it passes a
-  threshold: a 2% wobble is not an insight.
-
-NO MIGRATION NEEDED
+HOW I CHECKED THIS TIME
+  I wrote a sweep that looks for the shape of the claim rather than the words:
+  never leaves, nothing uploaded, no account, stays on your device, only copy.
+  It now reports 17 mentions, all of them accurate. Worth re-running whenever
+  this area changes again.

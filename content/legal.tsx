@@ -9,7 +9,7 @@ export const LEGAL: LegalPage[] = [
   {
     slug: "privacy-policy",
     title: "Privacy policy",
-    description: `How ${BRAND.name} handles your information. The short version: your documents and customer details never leave your device.`,
+    description: `How ${BRAND.name} handles your information: what is held, why, and what is never done with it.`,
     updated: UPDATED,
     Body: () => (
       <>
@@ -116,7 +116,7 @@ export const LEGAL: LegalPage[] = [
       <>
         <h2>Why this exists</h2>
         <p>Most free invoice tools want your email before they will give you a PDF, and most of them upload your customer list to a server you know nothing about. For a document that contains your prices, your margins and your clients, that is a strange trade.</p>
-        <p>{BRAND.name} does the work in your browser instead. There is no upload, no account, and nowhere for your data to go.</p>
+        <p>{BRAND.name} does the work in your browser instead, and you can use the whole thing without an account. When you do make one, it exists to keep a copy safe and your devices in step, not to collect anything.</p>
 
         <h2>How it works</h2>
         <p>Everything, including the PDF, is built by code running on your own device. Tax rules live in country packs: structured data carrying rates, formats and the dates each rule applies between. Nothing is hard-coded, which is why an invoice dated before a rate change still calculates on the old rate.</p>

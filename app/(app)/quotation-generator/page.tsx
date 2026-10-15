@@ -2,7 +2,7 @@ import Builder from "@/components/builder/Builder";
 
 export const metadata = {
   title: "Free Quotation Generator - Send a Price Before You Start",
-  description: "Create a professional quotation or estimate with tax shown correctly for your country, then download it as a PDF. Free, no sign-up, nothing uploaded."
+  description: "Create a professional quotation or estimate with tax shown correctly for your country, then download it as a PDF. Free, no sign-up needed, and built in your browser."
 };
 
 export default function Page() {

@@ -19,7 +19,7 @@ export const CALCULATORS: CalcDef[] = [
     slug: "profit-margin",
     name: "Profit margin",
     title: "Profit Margin Calculator - Margin and Markup from Price and Cost",
-    description: "Work out profit, margin and markup from a selling price and a cost. Free, instant, and nothing you type leaves your browser.",
+    description: "Work out profit, margin and markup from a selling price and a cost. Free and instant, worked out in your browser as you type.",
     blurb: "Profit, margin and markup from a price and a cost.",
     Component: ProfitMargin,
     about: [

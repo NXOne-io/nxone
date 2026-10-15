@@ -2,7 +2,7 @@ import Builder from "@/components/builder/Builder";
 
 export const metadata = {
   title: "Free Purchase Order Generator - PO Format with Tax",
-  description: "Create a purchase order for a supplier with quantities, rates and tax, and download it as a PDF. Free, no sign-up, and nothing leaves your browser."
+  description: "Create a purchase order for a supplier with quantities, rates and tax, and download it as a PDF. Free, no sign-up needed, and built in your browser."
 };
 
 export default function Page() {

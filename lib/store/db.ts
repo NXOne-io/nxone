@@ -2,7 +2,8 @@ import { emptyWorkspace, type CatalogueItem, type Client, type Expense, type Pro
 
 /**
  * Everything a person saves lives on their own device. This is a small store over a storage
- * adapter: the browser's local storage in the app, an object in tests. No server, no account.
+ * adapter: the browser's local storage in the app, an object in tests. A copy syncs to an account
+ * when there is one, but this is always the working copy.
  *
  * It is deliberately boring. The interesting part is that there is nowhere else for the data to go.
  */

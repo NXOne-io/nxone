@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
       <section className="wrap py-14 sm:py-20">
-        <p className="chip">Free, no sign-up</p>
+        <p className="chip">Free, and your work is kept safe</p>
         <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.05] sm:text-6xl">Send an invoice your accountant will not send back.</h1>
         <p className="mt-5 max-w-2xl text-lg text-ink-soft">Invoices, quotations, purchase orders and receipts, with the tax worked out for the country you sell from. Your documents are built in your browser, and a free account keeps a copy safe and your devices in step. Your data is yours, and leaves whenever you want it to.</p>
         <div className="mt-8 flex flex-wrap gap-3">
@@ -61,7 +61,7 @@ export default function Home() {
             <p className="mt-3 text-ink-soft">Change the place of supply and every line switches between CGST with SGST and IGST on its own. Pick a country and the currency, tax labels and layout follow. Where a rate depends on your exact street, as US sales tax does, you type it in and we say so rather than guessing.</p>
           </div>
           <dl className="grid content-start gap-4 sm:grid-cols-2">
-            {[["Nothing is uploaded", "Your customer list and your prices never reach us. There is nowhere for them to go."], ["No account to make", "Open it, type, download. Your work waits here when you come back."], ["Numbers that add up", "Amounts are counted in whole paise and cents, so a long invoice never drifts by a rupee."], ["A4 and print ready", "The PDF looks the same for your client, your bank and your auditor."]].map(([t, d]) => (
+            {[["Your work is kept safe", "A free account holds a copy, so a cleared browser or a lost laptop is not a lost year of invoices."], ["Start without an account", "Open it, type, download. Sign up when you want the same work on your phone as well."], ["Numbers that add up", "Amounts are counted in whole paise and cents, so a long invoice never drifts by a rupee."], ["A4 and print ready", "The PDF looks the same for your client, your bank and your auditor."]].map(([t, d]) => (
               <div key={t} className="card p-5"><dt className="font-display text-lg">{t}</dt><dd className="mt-1 text-sm text-ink-soft">{d}</dd></div>
             ))}
           </dl>

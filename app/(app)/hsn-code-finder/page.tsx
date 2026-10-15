@@ -4,7 +4,7 @@ import { HSN } from "@/lib/countries/hsn";
 
 export const metadata = {
   title: { absolute: "HSN and SAC Code Finder - Search by What You Sell" },
-  description: "Find the HSN or SAC code for your product or service by typing what you sell, with the GST rate usually applied. Free, no sign-up."
+  description: "Find the HSN or SAC code for your product or service by typing what you sell, with the GST rate usually applied. Free, no sign-up needed."
 };
 
 export default function Page() {

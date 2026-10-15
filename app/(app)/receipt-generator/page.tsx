@@ -2,7 +2,7 @@ import Builder from "@/components/builder/Builder";
 
 export const metadata = {
   title: "Free Receipt Generator - Payment Receipt with Tax",
-  description: "Create a payment receipt showing what was paid, when and for what, with tax where it applies. Free, no sign-up, and built in your browser."
+  description: "Create a payment receipt showing what was paid, when and for what, with tax where it applies. Free, no sign-up needed, and built in your browser."
 };
 
 export default function Page() {

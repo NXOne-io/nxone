@@ -16,7 +16,7 @@ export function ogImage(title: string, subtitle?: string) {
           <div style={{ fontSize: title.length > 48 ? 58 : 70, fontWeight: 700, lineHeight: 1.1, letterSpacing: -1 }}>{title}</div>
           {subtitle ? <div style={{ marginTop: 22, fontSize: 30, color: "#C8D8CF", lineHeight: 1.3 }}>{subtitle}</div> : null}
         </div>
-        <div style={{ fontSize: 24, color: "#C6F24E" }}>Free. No sign-up. Nothing uploaded.</div>
+        <div style={{ fontSize: 24, color: "#C6F24E" }}>Free. Start without an account.</div>
       </div>
     ),
     OG_SIZE
